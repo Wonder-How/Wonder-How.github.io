@@ -43,13 +43,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 - [Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet](https://github.com), A, B, C, **CVPR 2020**
 
 # 🎖 Honors and Awards
-- *2021.10* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-- *2021.09* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
+- *National Scholarship*, Ministry of Education of China, 2024. 
+- *Outstanding Student Model*, Beijing Institute of Technology, 2024. 
+- *Research and Innovation Role Model*, BIT Rui Xin Academy, 2024.
+- *National First Prize* in Big Data Mathematical Modeling Competition, China Society of Optimization, Overall Planning and Economic Mathematics, 2023.
 
 # 📖 Educations
 - *2026.08 (expected) - 2030.06 (expected)*, Incoming Doctor of Philosophy, Department of Computer Science and Engineering, Hong Kong University of Science and Technology, Hong Kong.
-- *2022.09 - 2026.06 (expected)*, Undergraduate, Electronics Science and Technology, School of Integrated Circuits and Electronics, Beijing Institute of Technology, Beijing.
-- *2019.09 - 2022.06*, Highschool, Chaoyang Experimental Middle School, Swatou.
+- *2022.09 - 2026.06 (expected)*, Bachelor, Electronics Science and Technology, School of Integrated Circuits and Electronics, Beijing Institute of Technology, Beijing.
+- *2019.09 - 2022.06*, Highschool Student, Chaoyang Experimental Middle School, Swatou.
 
 # 💬 Invited Talks
 - *2021.06*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
