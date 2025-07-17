@@ -55,9 +55,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 - *2022.09 - 2026.06 (expected)*, Bachelor, Electronics Science and Technology, [School of Integrated Circuits and Electronics](https://ice.bit.edu.cn/), [Beijing Institute of Technology](https://www.bit.edu.cn/), Beijing.
 - *2019.09 - 2022.06*, Highschool Student, Chaoyang Experimental Middle School, Swatou.
 
-# 💬 Invited Talks
+<!-- # 💬 Invited Talks
 - *2021.06*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-- *2021.03*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet.  \| [\[video\]](https://github.com/)
+- *2021.03*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet.  \| [\[video\]](https://github.com/) -->
 
 # 💻 Internships
-- *2019.05 - 2020.02*, [Lorem](https://github.com/), China.
+- *2024.08 - 2025.05*, Research Assistant, BIT Intelligent Human Machine Systems (IHMS) Lab, supervised by [Prof.Luzheng Bi](https://me.bit.edu.cn/szdw/jsml/zzgcx/jdxtyzbyjs/bssds16/2b2a395ad7bd4802b4381108446f7cb6.htm).

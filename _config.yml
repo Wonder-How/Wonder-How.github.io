@@ -21,7 +21,7 @@ baidu_site_verification  :  # get baidu_site_verification from https://ziyuan.ba
 
 # Site Author
 author:
-  name             : "Dehao Wang (王德浩)"
+  name             : "Dehao Wang \n (王德浩)"
   avatar           : "images/人-一寸.png"
   bio              : "Beijing Institute of Technology"
   location         : "Beijing, China"
@@ -37,7 +37,7 @@ author:
   flickr           :
   facebook         :
   foursquare       :
-  github           : # e.g., "github username"
+  github           : Wonder-How # e.g., "github username"
   google_plus      :
   keybase          :
   instagram        :
