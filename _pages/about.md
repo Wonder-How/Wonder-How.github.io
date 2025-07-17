@@ -35,14 +35,15 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 
 **Brain-Inspired Deep Learning Model for EEG-Based Low-Quality Video Target Detection with Phased Encoding and Aligned Fusion**
 
-[**Paper**](files/ESWA.pdf) | [**Code**](https://github.com/Wonder-How/PSAFNet)
+[**Paper**](files/ESWA.pdf)|[**Code**](https://github.com/Wonder-How/PSAFNet)|[**Slides**](files/ESWA_WDH.pptx)
 
 **Dehao Wang**, Jianting Shi, Manyu Liu, Wenao Han, Luzheng Bi and Weijie Fei*<br>
-Expert Systems with Applications (ESWA, CAS Q1 top, IF:7.5, AR:15%) <br>
+Expert Systems with Applications<br>
+(ESWA, CAS Q1 top, IF:7.5, AR:15%) <br>
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">TITS(under review)</div><img src='images/TITS_flows.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">TITS (review)</div><img src='images/TITS_flows.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 <!-- <div class='paper-box'><div class='paper-box-image'><div><div class="badge">CVPR 2016</div><img src='images/ESWA_flows.png' alt="sym" width="100%"></div></div> -->
@@ -52,11 +53,12 @@ Expert Systems with Applications (ESWA, CAS Q1 top, IF:7.5, AR:15%) <br>
 [**Paper**](https://arxiv.org/pdf/2505.21049)
 
 **Dehao Wang**, Haohang Zhu, Yiwen Xu and Kaiqi Liu*<br>
-IEEE Transactions on Intelligent Transportation Systems (TITS, CAS Q2 Top, CCFB, IF:7.9) <br>
+IEEE Transactions on Intelligent Transportation Systems<br> 
+(TITS, CAS Q2 Top, CCFB, IF:7.9) <br>
 </div>
 </div>
 
-- [A Novel Framework for Pothole Area Estimation Based on Object Detection and Monocular Metric Depth Estimation](https://ieeexplore.ieee.org/abstract/document/10869122/), Dehao Wang, Yiwen Xu, Haohang Zhu and Kaiqi Liu*, **IEEE International Conference on Signal, Information and Data Processing (ICSIDP)**
+- [A Novel Framework for Pothole Area Estimation Based on Object Detection and Monocular Metric Depth Estimation](https://ieeexplore.ieee.org/abstract/document/10869122/), **Dehao Wang**, Yiwen Xu, Haohang Zhu and Kaiqi Liu*, **IEEE International Conference on Signal, Information and Data Processing (ICSIDP)**
 
 # 🎖 Honors and Awards
 - *National Scholarship*, Ministry of Education of China, 2024.
