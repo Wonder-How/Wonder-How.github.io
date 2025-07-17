@@ -60,6 +60,24 @@ IEEE Transactions on Intelligent Transportation Systems<br>
 
 - [A Novel Framework for Pothole Area Estimation Based on Object Detection and Monocular Metric Depth Estimation](https://ieeexplore.ieee.org/abstract/document/10869122/), **Dehao Wang**, Yiwen Xu, Haohang Zhu and Kaiqi Liu*, **IEEE International Conference on Signal, Information and Data Processing (ICSIDP)**
 
+# 📜 Patents
+
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge"></div><img src='images/patent_fish.png' alt="sym" width="100%"></div></div>
+<div class='paper-box-text' markdown="1">
+
+<!-- <div class='paper-box'><div class='paper-box-image'><div><div class="badge">CVPR 2016</div><img src='images/ESWA_flows.png' alt="sym" width="100%"></div></div> -->
+
+[**A Developed Precision Feeding System for Aquaculture**](https://pss-system.cponline.cnipa.gov.cn/documents/detail?prevPageTit=changgui)
+
+<!-- [**Paper**](https://arxiv.org/pdf/2505.21049) -->
+
+**Dehao Wang**, Haorui Guo, Tingting Zhong, Zhoutong Li and Xiangfu Zhang*<br>
+National Invention Patent (published)<br>
+</div>
+</div>
+
+- [Fish Counting and Feed Distribution System Platform V1.0 Based on Deep Learning](files/software_fish.pdf), **Dehao Wang**, Yongming Wang and Haifeng Shao, **Software Copyright (granted)**
+
 # 🎖 Honors and Awards
 - *National Scholarship*, Ministry of Education of China, 2024.
 - *EHiWAY Scholarship*, ​​EHiWAY Microelectronics, 2024. 
