@@ -23,8 +23,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 
 
 # 🔥 News
-- *2022.02*: &nbsp;🎉🎉 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-- *2022.02*: &nbsp;🎉🎉 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
+- *2025.05*: &nbsp;🎉🎉 My first top-tier journal paper on brain-inspired decoding for brain-computer interfaces, combining neuroscience and AI, was successfully accepted by [ESWA](https://www.sciencedirect.com/journal/expert-systems-with-applications).
+- *2024.08*: &nbsp;🎉🎉 My first conference paper on pothole estimation for autonomous driving was successfully accepted by [IEEE ICSIDP](https://signalprocessingsociety.org/blog/icsidp-2024-2024-ieee-international-conference-signal-information-and-data-processing).
 
 # 📝 Publications 
 
@@ -35,7 +35,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 
 **Brain-Inspired Deep Learning Model for EEG-Based Low-Quality Video Target Detection with Phased Encoding and Aligned Fusion**
 
-[**Paper**](files/ESWA.pdf)\|[**Code**](https://github.com/Wonder-How/PSAFNet)\|[**Slides**](files/ESWA_WDH.pptx)
+[**Paper**](files/ESWA.pdf)`|`[**Code**](https://github.com/Wonder-How/PSAFNet)`|`[**Slides**](files/ESWA_WDH.pptx)
 
 **Dehao Wang**, Jianting Shi, Manyu Liu, Wenao Han, Luzheng Bi and Weijie Fei*<br>
 Expert Systems with Applications<br>
