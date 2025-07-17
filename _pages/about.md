@@ -28,14 +28,14 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 
 # 📝 Publications 
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge"></div><img src='images/ESWA_flows.png' alt="sym" width="100%"></div></div>
-<div class='paper-box-text' markdown="1">
+
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ESWA</div><img src='images/ESWA_flows.png' alt="sym" width="100%"></div></div>
 
 Brain-Inspired Deep Learning Model for EEG-Based Low-Quality Video Target Detection with Phased Encoding and Aligned Fusion
-**Dehao Wang**, Jianting Shi, Manyu Liu, Wenao Han, Luzheng Bi, Weijie Fei
 
+**Dehao Wang**, Jianting Shi, Manyu Liu, Wenao Han, Luzheng Bi, Weijie Fei<br>
+Expert Systems with Applications (ESWA, CAS Q1 Top, AR: 15%) <br>
 [**Paper**](files/ESWA.pdf) | [**Code**](https://github.com/Wonder-How/PSAFNet)
-Expert Systems with Applications (ESWA, CAS Q1 Top, AR: 15%) 
 </div>
 </div>
 
