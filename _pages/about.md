@@ -35,7 +35,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet 
 
 **Brain-Inspired Deep Learning Model for EEG-Based Low-Quality Video Target Detection with Phased Encoding and Aligned Fusion**
 
-[**Paper**](files/ESWA.pdf)`|`[**Code**](https://github.com/Wonder-How/PSAFNet)`|`[**Slides**](files/ESWA_WDH.pptx)
+[**Paper**](files/ESWA.pdf)`|`[**Code**](https://github.com/Wonder-How/PSAFNet)`|`[**Slides**](files/ESWA_WDH.pptx)`|`[**Wechat Artical**](https://mp.weixin.qq.com/s/joKh1hQaaiopZ6UuClwtsg)
 
 **Dehao Wang**, Jianting Shi, Manyu Liu, Wenao Han, Luzheng Bi and Weijie Fei*<br>
 Expert Systems with Applications<br>
