@@ -7,7 +7,7 @@
 
 # Site Settings
 title                    : "Dehao Wang"
-description              : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. "
+description              : "Passionate about leveraging AI to address real-life challenges, especially in Smart Health. "
 repository               : "Wonder-How/Wonder-How.github.io"
 google_scholar_stats_use_cdn : false
 
@@ -21,7 +21,7 @@ baidu_site_verification  :  # get baidu_site_verification from https://ziyuan.ba
 
 # Site Author
 author:
-  name             : "\"Dehao Wang\n(王德浩)\""
+  name             : "Dehao Wang     (王德浩)"
   avatar           : "images/人-一寸.png"
   bio              : "Beijing Institute of Technology"
   location         : "Beijing, China"
