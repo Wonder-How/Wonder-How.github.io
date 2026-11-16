@@ -4,18 +4,18 @@ const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const palette = [['#197d72','#e8f4ee'],['#587a9c','#edf2f9'],['#7c749e','#f1eef8'],['#a97e32','#faf2df'],['#b2754d','#fbefe6'],['#548780','#edf6f4']];
 const englishLabels = {
-  "A1": "Spontaneous lexical speech",
-  "A1a": "Nonword transcription",
-  "A2": "Spontaneous social vocalizations",
-  "A9": "Non-socially directed vocalization",
-  "A4": "Echolalic repetition",
-  "A5": "Fixed phrases",
-  "B6": "Positive social initiation",
-  "B7": "Vocal response after name mention",
-  "B10": "Vocal requests",
-  "B15": "Social initiation frequency",
-  "B16b": "Caregiver attention bids (proxy)",
-  "E2": "Negative vocalizations",
+  "A1": "Spontaneous non-echo speech",
+  "A1a": "Babbling",
+  "A2": "Vocalization directedness — directed",
+  "A9": "Vocalization directedness — undirected",
+  "A4": "Immediate echolalia",
+  "A5": "Stereotyped / idiosyncratic speech",
+  "B6": "Shared positive vocal affect",
+  "B7": "Vocal response to name",
+  "B10": "Vocal requesting",
+  "B15": "Vocal social overture",
+  "B16b": "Caregiver-directed attention bid",
+  "E2": "Negative affect vocalization",
   "social:3.1": "Non-social vocalizations",
   "social:3.2": "Typical response",
   "social:3.3": "Requests",
@@ -93,7 +93,7 @@ function selectChild(id, recordingId) {
   if (!child || !files.length) return;
   state.child = child;
   $('childSelect').value = id;
-  $('recordingSelect').innerHTML = files.map(r => `<option value="${esc(r.id)}">${esc(r.id)}${r.demo_label ? ` · ${esc(r.demo_label)}` : r.annotated ? '' : ' · Unannotated'}</option>`).join('');
+  $('recordingSelect').innerHTML = files.map(r => `<option value="${esc(r.id)}">${esc(r.id)}${r.annotated ? '' : ' · Unannotated'}</option>`).join('');
   $('recordingSelect').disabled = false;
   $('nextRecording').disabled = files.length < 2;
   const initial = files.find(r => r.id === recordingId) || files.find(r => r.child === id && r.annotated) || files[0];
@@ -109,17 +109,15 @@ function selectRecording(id) {
   state.recording = r;
   state.child = state.data.children.find(c => c.id === r.child);
   $('childSelect').value = r.child;
-  state.event = null; state.pendingSeek = Number.isFinite(r.demo_start) ? {target:r.demo_start,play:false} : null; state.liveSignature = '';
+  state.code = null; state.event = null; state.pendingSeek = null; state.liveSignature = '';
   $('recordingSelect').value = id;
-  $('recordingTitle').textContent = r.demo_label || id;
+  $('recordingTitle').textContent = id;
   error('');
   state.media = video; video.hidden = false; $('mediaFallback').hidden = true;
   video.src = r.video_url || `./media/video/${encodeURIComponent(id)}`;
   $('mediaBadge').textContent = r.annotated ? 'Video' : 'Unannotated';
   video.playbackRate = Number($('speed').value); video.muted = false;
   for (const name of ['playPause','back5','forward5','speed']) $(name).disabled = false;
-  if (r.demo_focus?.[state.taxonomy]) state.code = r.demo_focus[state.taxonomy];
-  if (!state.code || !definitions().some(d => d.code === state.code)) state.code = definitions().find(d => r.counts[state.taxonomy][d.code] > 0)?.code || definitions()[0]?.code;
   renderCards(); renderTimeline(); renderEvidence(); updateTime(0);
   const url = new URL(location.href); url.searchParams.set('child',state.child.id); url.searchParams.set('recording',r.id); url.searchParams.set('view',state.taxonomy); history.replaceState(null,'',url);
 }
@@ -160,7 +158,12 @@ function renderTimeline() {
 
 function renderEvidence() {
   const d = definition(), events = selectedEvents();
-  if (!d) { $('events').replaceChildren(); $('prevEvent').disabled = true; $('nextEvent').disabled = true; return; }
+  $('evidencePanel').hidden = !d;
+  if (!d) {
+    $('events').replaceChildren(); $('eventSummary').textContent = '';
+    $('evidenceTitle').textContent = 'Select a symptom or behavior';
+    $('prevEvent').disabled = true; $('nextEvent').disabled = true; return;
+  }
   $('evidenceTitle').textContent = `${prettyCode(d.code)} · ${d.label}`;
   $('prerollLabel').textContent = state.taxonomy === 'symptoms' && state.code === 'B7' ? 'Include name mention' : 'Include context';
   const missing = events.filter(e => !timed(e)).length;
@@ -251,7 +254,7 @@ function adjacentEvent(direction) {
 
 function switchTaxonomy(taxonomy) {
   if (!state.recording || state.taxonomy === taxonomy || !state.data.taxonomies[taxonomy]) return;
-  state.taxonomy = taxonomy; state.event = null; state.code = state.recording.demo_focus?.[taxonomy] || definitions().find(d => state.recording.counts[taxonomy][d.code] > 0)?.code || definitions()[0]?.code;
+  state.taxonomy = taxonomy; state.event = null; state.code = null;
   document.querySelectorAll('[data-taxonomy]').forEach(b => { b.classList.toggle('selected',b.dataset.taxonomy === taxonomy); b.setAttribute('aria-pressed',String(b.dataset.taxonomy === taxonomy)); });
   state.liveSignature = ''; renderCards(); renderTimeline(); renderEvidence(); updateTime();
   const url = new URL(location.href); url.searchParams.set('view',taxonomy); history.replaceState(null,'',url);

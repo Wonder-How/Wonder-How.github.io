@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en" data-catalog="./catalog.json">
+<html lang="en" data-catalog="./catalog.json?v=332c3217cad9">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light"><meta name="robots" content="noindex,nofollow"><title>AAC Speech Demo · Clinical Review</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23147c76'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23edf6f3'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=f2db98563064">
 </head>
 <body>
   <div id="startupStatus" role="status">Connecting to the review service… If this message remains, open the service's HTTP or HTTPS link and refresh.</div>
@@ -47,13 +47,13 @@
         <div id="timeline" class="timeline"></div>
         <div class="timeline-axis"><span>00:00</span><span id="timelineEnd">—</span></div>
       </section>
-      <section class="panel evidence-panel">
+      <section id="evidencePanel" class="panel evidence-panel" hidden>
         <div class="section-heading"><h2 id="evidenceTitle">Select a symptom or behavior</h2><div class="evidence-navigation"><button id="prevEvent" class="quiet" title="Previous occurrence ([)">← Previous</button><button id="nextEvent" class="quiet" title="Next occurrence (])">Next →</button></div></div>
         <div class="evidence-options"><span id="eventSummary"></span><label><input type="checkbox" id="preroll" checked> <span id="prerollLabel">Include context</span></label></div>
         <div id="events" class="event-list"></div>
       </section>
     </section>
   </main>
-  <script defer src="./app.js"></script>
+  <script defer src="./app.js?v=25e8ea40c713"></script>
 </body>
 </html>
