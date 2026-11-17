@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pothole Lab · How to use</title>
+<meta name="description" content="A quick guide to the interactive Pothole Lab demo.">
+<link rel="stylesheet" href="style.css">
+<style>body{max-width:850px;margin:0 auto;padding:35px 24px 60px;line-height:1.8}h1{font-size:34px;margin-top:25px}h2{font-size:20px;margin-top:30px;color:var(--lime)}p,li{color:#bdcbd0;font-size:14px}li{margin:9px 0}a{color:var(--lime)}strong{color:var(--text)}.back{font-size:13px}.note{border:1px solid var(--line);padding:16px 20px;border-radius:6px;background:var(--panel)}</style>
+</head>
+<body>
+<a class="back" href="./">← Back to the demo</a>
+<div class="eyebrow" style="margin-top:28px">POTHOLE LAB</div>
+<h1>Try the road. Change one pothole.</h1>
+<p>This interactive demo lets you place up to eight potholes on a flat, sloped or curved road, adjust each pothole and inspect the result.</p>
+<h2>Start here</h2>
+<ol>
+<li>Keep the default <strong>Four varied potholes</strong> example, or choose another scene under <strong>Reproducible examples</strong>.</li>
+<li>Select a pothole in the left panel. Adjust <strong>Target footprint</strong> (area), <strong>Maximum depression</strong> (depth) and <strong>Contour irregularity</strong> (outline shape). <strong>Lateral u</strong> and <strong>Longitudinal v</strong> move it across and along the road.</li>
+<li>Use <strong>Close</strong> to inspect the selected pothole, <strong>Top</strong> for an overhead view, or <strong>Wide</strong> for the whole road.</li>
+<li>Try <strong>Flat</strong>, <strong>Slope</strong> and <strong>Curve</strong>. Choose <strong>Road-edge damage</strong> to see a pothole cut through the road boundary.</li>
+</ol>
+<p class="note"><strong>Mouse:</strong> left-drag to orbit, scroll to zoom and right-drag to pan. On touch screens, drag with one finger to orbit and use two fingers to zoom or pan.</p>
+<h2>Inspect and save</h2>
+<ul>
+<li><strong>Wireframe</strong> shows the triangle mesh. <strong>Normals</strong>, <strong>Mask</strong>, <strong>Depth</strong> and <strong>Instances</strong> show the corresponding inspection views.</li>
+<li><strong>Original road</strong> toggles the undamaged surface. <strong>Cross-section</strong> shows a profile through the selected pothole; switch between across and along the road.</li>
+<li><strong>Sampling</strong> and <strong>Mesh construction</strong> change the geometry resolution and layout. <strong>Compare sampling levels</strong> measures the same scene at three resolutions.</li>
+<li><strong>Save scene</strong> downloads the current parameters as JSON. <strong>Load scene</strong> restores a previously saved scene.</li>
+<li><strong>Export aligned dataset</strong> downloads a ZIP containing RGB, mask, instance IDs, geometric normals, metric camera depth and scene/camera metadata from the current view. Turn off <strong>Original road</strong> to enable export.</li>
+</ul>
+<h2>What the measurements mean</h2>
+<p>The footprint area is measured on the original, undamaged road surface. Depth is depression along the original surface normal. Exported camera depth is measured along the camera viewing axis; it is a different quantity from pothole depression.</p>
+<h2>Limits and browser requirements</h2>
+<p>Use a modern browser with WebGL 2 and hardware acceleration enabled. Rendering speed depends on your device and browser. GPU timing may be unavailable; the performance panel reports this explicitly. High sampling levels and exports can take longer on slower devices.</p>
+<p>The demo uses analytic road surfaces. It does not import arbitrary terrain or simulate vehicle dynamics. Potholes whose support regions overlap are rejected, and the last valid scene is retained. With road-edge mode enabled, the area target applies to the footprint remaining on the road.</p>
+<p><a href="./">Open Pothole Lab →</a></p>
+</body>
+</html>

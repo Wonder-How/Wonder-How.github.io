@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T12:46:06.782183+00:00",
+  "intendedUrl": "https://wonderhow.site/5411_demo/",
+  "entryPoint": "index.html",
+  "sourceProject": "pothole-final",
+  "payloadFiles": 17,
+  "totalPayloadBytes": 2176352,
+  "files": [
+    {
+      "path": "help.html",
+      "bytes": 3974,
+      "sha256": "0e7f50f870ea2dab0ee3608fa18425f2e0d9ea4b230efec7519dbe71c312c409"
+    },
+    {
+      "path": "index.html",
+      "bytes": 9315,
+      "sha256": "cba9650c81189036f150c5d5f816414c5cf4098c24fe8bb1dbdece935248366e"
+    },
+    {
+      "path": "lib/OrbitControls.js",
+      "bytes": 38703,
+      "sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c"
+    },
+    {
+      "path": "lib/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "lib/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "lib/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "path": "src/app.mjs",
+      "bytes": 31585,
+      "sha256": "13f332f56856dc5f342c97419c1ca22d8e10a3e0a0ea5e83c8d33fedfb0e8d9f"
+    },
+    {
+      "path": "src/comparison.mjs",
+      "bytes": 4095,
+      "sha256": "b9cbb6d0be4653e6949b4171c74e54f9a7a01fe434ef92daae17d58737d4bd9b"
+    },
+    {
+      "path": "src/geometry-final.mjs",
+      "bytes": 24617,
+      "sha256": "6a304ae01b4ade9bd73c2770aead5a86c6a2799acb65884fbaf696f27b291aa2"
+    },
+    {
+      "path": "src/geometry-legacy.mjs",
+      "bytes": 15760,
+      "sha256": "df2b28234eafe94f26d58d2eb99e359c83c1a4817d73b98befd351c6a0a0f32c"
+    },
+    {
+      "path": "src/geometry.mjs",
+      "bytes": 590,
+      "sha256": "ccb7185adefca9f442df7dd7cca57a39fae7ccfce84f7e32edf25ec8e8aa2947"
+    },
+    {
+      "path": "src/inspection.mjs",
+      "bytes": 2068,
+      "sha256": "73a9659715a57c9bd399aec8e7ed255e362f1d50fba9306b638f8db24fc7639f"
+    },
+    {
+      "path": "src/performance.mjs",
+      "bytes": 12143,
+      "sha256": "6e02f40abe259c6f36270e7da9f0e972983fd363ac9ac661ac07374bd9366987"
+    },
+    {
+      "path": "src/scenes.mjs",
+      "bytes": 1279,
+      "sha256": "ea445fc6e95dd5bf2952d76fe6828ec93b90856756db4c6692d384970509d37e"
+    },
+    {
+      "path": "src/shaders.mjs",
+      "bytes": 10544,
+      "sha256": "f50d4b680dc18b1edd7481a3dd93f3be5908aa8aa5eecd27ebc73e5fe8bcf186"
+    },
+    {
+      "path": "src/zip.mjs",
+      "bytes": 1765,
+      "sha256": "3f75eb670a7f3af0727ebafbb79581f2166d94751668ffac6f4941d50acce115"
+    },
+    {
+      "path": "style.css",
+      "bytes": 12265,
+      "sha256": "b8be86a125f456e7cdc31c14643db44e0728344b8c23c0a708feff8dd9a72793"
+    }
+  ],
+  "validation": {
+    "htmlReferencesAndStaticModuleImports": "passed",
+    "resolvedReferences": [
+      {
+        "from": "index.html",
+        "ref": "style.css",
+        "resolvedPath": "style.css"
+      },
+      {
+        "from": "index.html",
+        "ref": "./",
+        "resolvedPath": "index.html"
+      },
+      {
+        "from": "index.html",
+        "ref": "help.html",
+        "resolvedPath": "help.html"
+      },
+      {
+        "from": "index.html",
+        "ref": "src/app.mjs",
+        "resolvedPath": "src/app.mjs"
+      },
+      {
+        "from": "help.html",
+        "ref": "style.css",
+        "resolvedPath": "style.css"
+      },
+      {
+        "from": "help.html",
+        "ref": "./",
+        "resolvedPath": "index.html"
+      },
+      {
+        "from": "help.html",
+        "ref": "./",
+        "resolvedPath": "index.html"
+      },
+      {
+        "from": "src/geometry-final.mjs",
+        "ref": "./geometry-legacy.mjs",
+        "resolvedPath": "src/geometry-legacy.mjs"
+      },
+      {
+        "from": "src/geometry.mjs",
+        "ref": "./geometry-legacy.mjs",
+        "resolvedPath": "src/geometry-legacy.mjs"
+      },
+      {
+        "from": "src/geometry.mjs",
+        "ref": "./geometry-final.mjs",
+        "resolvedPath": "src/geometry-final.mjs"
+      },
+      {
+        "from": "src/geometry.mjs",
+        "ref": "./geometry-legacy.mjs",
+        "resolvedPath": "src/geometry-legacy.mjs"
+      },
+      {
+        "from": "src/comparison.mjs",
+        "ref": "./geometry.mjs",
+        "resolvedPath": "src/geometry.mjs"
+      },
+      {
+        "from": "src/inspection.mjs",
+        "ref": "./geometry.mjs",
+        "resolvedPath": "src/geometry.mjs"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "three",
+        "resolvedPath": "lib/three.module.js"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "../lib/OrbitControls.js",
+        "resolvedPath": "lib/OrbitControls.js"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "./geometry.mjs",
+        "resolvedPath": "src/geometry.mjs"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "./shaders.mjs",
+        "resolvedPath": "src/shaders.mjs"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "./performance.mjs",
+        "resolvedPath": "src/performance.mjs"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "./scenes.mjs",
+        "resolvedPath": "src/scenes.mjs"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "./inspection.mjs",
+        "resolvedPath": "src/inspection.mjs"
+      },
+      {
+        "from": "src/app.mjs",
+        "ref": "./zip.mjs",
+        "resolvedPath": "src/zip.mjs"
+      },
+      {
+        "from": "lib/three.module.js",
+        "ref": "./three.core.js",
+        "resolvedPath": "lib/three.core.js"
+      },
+      {
+        "from": "lib/three.module.js",
+        "ref": "./three.core.js",
+        "resolvedPath": "lib/three.core.js"
+      },
+      {
+        "from": "lib/OrbitControls.js",
+        "ref": "three",
+        "resolvedPath": "lib/three.module.js"
+      }
+    ],
+    "allRuntimeDependenciesLocal": true,
+    "syntaxCheckedModules": [
+      "src/performance.mjs",
+      "src/shaders.mjs",
+      "src/geometry-final.mjs",
+      "src/zip.mjs",
+      "src/geometry.mjs",
+      "src/geometry-legacy.mjs",
+      "src/scenes.mjs",
+      "src/comparison.mjs",
+      "src/inspection.mjs",
+      "src/app.mjs",
+      "lib/three.module.js",
+      "lib/OrbitControls.js",
+      "lib/three.core.js"
+    ],
+    "browserSmoke": {
+      "status": "passed",
+      "realNestedPath": "/5411_demo/",
+      "backend": "Chromium / SwiftShader software rendering",
+      "presets": [
+        "single",
+        "edge",
+        "stress",
+        "varied"
+      ],
+      "surfaces": [
+        "flat",
+        "slope",
+        "curve"
+      ],
+      "inspectionModes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "helpStatus": 200,
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "httpErrors": 0,
+      "ownedServerStopped": true,
+      "evidence": "Local QA artifacts retained outside the public payload"
+    }
+  },
+  "githubPagesCompatibility": {
+    "avoidsExcludedDirectories": [
+      "vendor",
+      "docs"
+    ],
+    "runtimeLibraryDirectory": "lib",
+    "publicUsagePage": "help.html",
+    "globalConfigModified": false
+  },
+  "hostingRequirements": [
+    "Serve the directory at /5411_demo/.",
+    "Redirect /5411_demo to /5411_demo/ before serving HTML, so relative resources use the demo directory.",
+    "Serve .mjs and .js with a JavaScript MIME type.",
+    "Serve assets as their actual files; do not rewrite missing .mjs/.js/.css requests to an HTML fallback.",
+    "No server-side process, API key, package installation or external CDN is required."
+  ],
+  "scope": "Runtime demo and short public usage guide only. The original project, report, appendices, raw measurements, source archive, recordings and slide deck were not copied.",
+  "manifestHashNote": "This manifest lists and hashes every payload file; the manifest itself is excluded to avoid a self-referential hash."
+}
