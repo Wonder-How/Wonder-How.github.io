@@ -4,8 +4,9 @@ import {buildRoad,surfaceSample} from './geometry.mjs';
 import {vertexShader,fragmentShader} from './shaders.mjs';
 import {benchmarkRenderer,rendererIdentity,summarize} from './performance.mjs';
 import {scenePreset,clone} from './scenes.mjs';
-import {crossSection,sectionSVG,sectionCSV} from './inspection.mjs';
+import {crossSection,sectionSVG,sectionCSV} from './inspection.mjs?v=2';
 import {zipStore} from './zip.mjs';
+import {t,initI18n,translateError} from './i18n.mjs';
 
 const $=selector=>document.querySelector(selector);
 const state=scenePreset('varied');
@@ -13,8 +14,16 @@ const lighting={raking:{direction:[-.85,.55,.5],ambient:.30,intensity:1.35},soft
 let renderer,scene,camera,controls,material,model,damagedGroup,originalGroup,outlineGroup;
 let selected=0,mode=0,view='wide',lightPreset='raking',before=false,paused=false,busy=false,animateLight=false,lightAngle=0;
 let comparison=null,lastBenchmark=null,sectionAxis='u',pending={},inputTimer,toastTimer,presetName='varied';
+let placementError=null,lastToast=null,renderIdentity=null,currentFps=null,initializationError=null;
+let benchmarkStatus={kind:'idle'};
+const modeCaptions={0:'Drag to orbit · scroll to zoom · right-drag to pan',1:'Actual mesh topology · local refinement around each pothole',2:'Camera-space geometric normals · material detail excluded',3:'Visible top-surface footprint · white = damaged road',4:'Camera-axis depth preview · 2–14 m · near = white',6:'Colored instance preview · exported IDs are raw 8-bit red values'};
+const surfaceLabels={flat:'FLAT',slope:'SLOPED',curve:'CURVED'};
+const meshLabels={adaptive:'adaptive',graded:'graded'};
+const resolutionLabels={low:'low',medium:'medium',high:'high'};
 
-function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4500);}
+
+function refreshToast(){if(lastToast)$('#toast').textContent=translateError(t(lastToast.message,lastToast.vars));}
+function toast(message,vars={}){lastToast={message,vars};refreshToast();$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4500);}
 function download(name,value,type='application/json'){
   const blob=value instanceof Blob?value:new Blob([typeof value==='string'?value:JSON.stringify(value,null,2)],{type});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
@@ -69,7 +78,8 @@ function rebuild(patch={}){
   render();return model.metrics;
 }
 function tryChange(patch){try{rebuild(patch);return true;}catch(error){toast(error.message);return false;}}
-function placementStatus(error){const el=$('#placement-status');el.dataset.state=error?'error':'ok';el.textContent=error?`${error.message} Last valid scene retained.`:`${state.potholes.length} independent potholes · ${state.edgeMode==='clip'?'road-edge clipping enabled':'full footprints retained'}.`;}
+function renderPlacementStatus(){const el=$('#placement-status');el.dataset.state=placementError?'error':'ok';el.textContent=placementError?t('{error} Last valid scene retained.',{error:translateError(placementError)}):t('{count} independent potholes · {edgeStatus}.',{count:state.potholes.length,edgeStatus:t(state.edgeMode==='clip'?'road-edge clipping enabled':'full footprints retained')});}
+function placementStatus(error){placementError=error?.message||null;renderPlacementStatus();}
 function applyVisibility(){if(!damagedGroup)return;damagedGroup.visible=!before;originalGroup.visible=before;outlineGroup.visible=$('#outline').checked&&!before&&mode!==3&&mode!==6;$('.legend').hidden=!outlineGroup.visible;material.uniforms.uBefore.value=Number(before);$('#export').disabled=before||busy;}
 function activeButton(selector,key,value){document.querySelectorAll(selector).forEach(b=>{const active=String(b.dataset[key])===String(value);b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
 function syncUI(){
@@ -78,24 +88,40 @@ function syncUI(){
   $('#allow-edge').checked=state.edgeMode==='clip';$('#hole-count').textContent=`${state.potholes.length} / 8`;
   $('#hole-list').replaceChildren();
   state.potholes.forEach((hole,i)=>{const b=document.createElement('button');b.className='hole-item'+(i===selected?' active':'');b.dataset.hole=String(i);b.setAttribute('aria-pressed',String(i===selected));const id=document.createElement('b');id.textContent=String(i+1).padStart(2,'0');const label=document.createElement('span');label.textContent=String(hole.id);const size=document.createElement('small');size.textContent=`${hole.area.toFixed(2)} m² / ${hole.depth.toFixed(2)} m`;b.append(id,label,size);$('#hole-list').append(b);});
-  $('#add-hole').disabled=state.potholes.length>=8;$('#remove-hole').disabled=state.potholes.length<=1;$('#selected-heading').textContent=`Selected: ${h.id}`;
+  $('#add-hole').disabled=state.potholes.length>=8;$('#remove-hole').disabled=state.potholes.length<=1;$('#selected-heading').textContent=t('Selected: {id}',{id:h.id});
   for(const name of ['area','depth','roughness','seed'])$('#'+name).value=h[name];
   $('#area-out').value=h.area.toFixed(2)+' m²';$('#depth-out').value=h.depth.toFixed(2)+' m';$('#roughness-out').value=h.roughness.toFixed(2);
   for(const axis of ['u','v']){$('#origin-'+axis).value=h.origin[axis];$('#origin-'+axis+'-out').value=h.origin[axis].toFixed(2)+' m';}
   $('#before').checked=before;$('#preset').value=presetName;
-  $('#scene-caption').textContent=`${{flat:'FLAT',slope:'SLOPED',curve:'CURVED'}[state.surface]} ROAD / ${state.potholes.length} POTHOLE${state.potholes.length===1?'':'S'}`;
+  renderDynamicUI();
+}
+function renderDynamicUI(){
+  if(!model)return;
+  $('#selected-heading').textContent=t('Selected: {id}',{id:state.potholes[selected].id});
+  $('#scene-caption').textContent=t(state.potholes.length===1?'{surface} ROAD / {count} POTHOLE':'{surface} ROAD / {count} POTHOLES',{surface:t(surfaceLabels[state.surface]),count:state.potholes.length});
   const m=model.metrics;
   $('#measured').innerHTML=`${m.measuredArea.toFixed(3)}<em>m²</em>`;
-  $('#area-error').textContent=`Total error ${(m.relativeAreaError*100).toFixed(3)}% · max per-hole ${(m.maxPerHoleRelativeAreaError*100).toFixed(3)}%`;
+  $('#area-error').textContent=t('Total error {total}% · max per-hole {max}%',{total:(m.relativeAreaError*100).toFixed(3),max:(m.maxPerHoleRelativeAreaError*100).toFixed(3)});
   $('#max-depth').innerHTML=`${m.maxDepth.toFixed(3)}<em>m</em>`;
   $('#triangles').textContent=`${m.triangles.toLocaleString()} / ${(m.borderTriangles||0).toLocaleString()}`;
-  $('#mesh-description').textContent=state.mesh==='adaptive'?'Local conforming quadtree':'Graded tensor grid';
+  $('#mesh-description').textContent=t(state.mesh==='adaptive'?'Local conforming quadtree':'Graded tensor grid');
   $('#build-time').innerHTML=`${m.buildMs.toFixed(1)}<em>ms</em>`;
-  $('#scene-summary').textContent=`${state.mesh} · ${state.resolution} · ${state.edgeMode==='clip'?'clipped edges':'contained footprints'}`;
+  $('#scene-summary').textContent=t('{mesh} · {resolution} · {edges}',{mesh:t(meshLabels[state.mesh]),resolution:t(resolutionLabels[state.resolution]),edges:t(state.edgeMode==='clip'?'clipped edges':'contained footprints')});
   $('#area-table').replaceChildren();
-  model.perHole.forEach((p,i)=>{const tr=document.createElement('tr');if(i===selected)tr.className='selected';for(const value of [String(p.id),p.targetArea.toFixed(3),p.measuredArea.toFixed(5),(100*p.relativeAreaError).toFixed(4)+'%',p.clipped?'Clipped':'Inside']){const td=document.createElement('td');td.textContent=value;tr.append(td);}$('#area-table').append(tr);});
-  $('#comparison-results').replaceChildren();$('#download-comparison').disabled=!comparison;
+  model.perHole.forEach((p,i)=>{const tr=document.createElement('tr');if(i===selected)tr.className='selected';for(const value of [String(p.id),p.targetArea.toFixed(3),p.measuredArea.toFixed(5),(100*p.relativeAreaError).toFixed(4)+'%',t(p.clipped?'Clipped':'Inside')]){const td=document.createElement('td');td.textContent=value;tr.append(td);}$('#area-table').append(tr);});
+  renderComparison();
 }
+function renderModeCaption(){$('#mode-caption').textContent=t(modeCaptions[mode]);}
+function renderFocusCaption(){$('#focus-mode').textContent=t(document.body.classList.contains('focus')?'Restore layout ↙':'Expand view ↗');}
+function renderRenderStatus(){if(renderIdentity)$('#render-status').textContent=t('{renderer} · {timer}',{renderer:t(renderIdentity.classification==='hardware-identified'?'Hardware WebGL':renderIdentity.classification==='software'?'Software WebGL':'WebGL renderer'),timer:t(renderIdentity.timerExtensionAvailable?'GPU timer available':'GPU timer unavailable')});}
+function renderFps(){if(currentFps!==null)$('#live-fps').textContent=t('{fps} FPS · current browser, not GPU time',{fps:currentFps});}
+function refreshLanguage(){
+  renderDynamicUI();renderModeCaption();renderFocusCaption();renderPlacementStatus();renderRenderStatus();renderFps();refreshToast();drawSection();
+  if(lastBenchmark)showBenchmark(lastBenchmark,{updateStatus:false});
+  renderBenchmarkStatus();
+  if(initializationError&&$('#loading'))$('#loading').textContent=t('Initialization failed: {error}',{error:translateError(initializationError)});
+}
+
 function selectHole(index){if(!Number.isInteger(index)||index<0||index>=state.potholes.length)throw new RangeError('Invalid pothole index.');selected=index;syncUI();drawSection();outlineGroup.children.forEach((o,i)=>o.material.color.setHex(i===selected?0xe6f39a:0x95b45e));if(view==='close'&&$('#follow-site').checked)setCameraView('close');render();}
 function updateSelected(patch){const holes=clone(state.potholes);holes[selected]={...holes[selected],...patch,origin:{...holes[selected].origin,...patch.origin}};return rebuild({potholes:holes});}
 function addHole(){
@@ -109,7 +135,7 @@ function addHole(){
 }
 function removeHole(){if(state.potholes.length<=1)throw new Error('Keep at least one pothole.');const holes=clone(state.potholes);holes.splice(selected,1);selected=Math.min(selected,holes.length-1);return rebuild({potholes:holes});}
 function loadPreset(name){if(busy)throw new Error('Wait for the current operation.');selected=0;presetName=name;before=false;rebuild(scenePreset(name));setMode(0);setCameraView('wide');}
-function setMode(value){if(![0,1,2,3,4,6].includes(Number(value)))throw new RangeError('Unknown inspection mode.');mode=Number(value);material.uniforms.uMode.value=mode===6?7:mode;material.wireframe=mode===1;activeButton('[data-mode]','mode',mode);$('#mode-caption').textContent={0:'Drag to orbit · scroll to zoom · right-drag to pan',1:'Actual mesh topology · local refinement around each pothole',2:'Camera-space geometric normals · material detail excluded',3:'Visible top-surface footprint · white = damaged road',4:'Camera-axis depth preview · 2–14 m · near = white',6:'Colored instance preview · exported IDs are raw 8-bit red values'}[mode];applyVisibility();render();}
+function setMode(value){if(![0,1,2,3,4,6].includes(Number(value)))throw new RangeError('Unknown inspection mode.');mode=Number(value);material.uniforms.uMode.value=mode===6?7:mode;material.wireframe=mode===1;activeButton('[data-mode]','mode',mode);renderModeCaption();applyVisibility();render();}
 function setBefore(value){before=Boolean(value);$('#before').checked=before;applyVisibility();render();}
 function setCameraView(value){
   if(!['wide','close','top'].includes(value))throw new RangeError('View must be wide, close, or top.');view=value;camera.up.set(0,1,0);
@@ -135,24 +161,38 @@ function queueInput(name,value){
   clearTimeout(inputTimer);inputTimer=setTimeout(()=>{const patch=pending;pending={};try{updateSelected(patch);}catch(error){toast(error.message);}},100);
 }
 function commitPending(){if(Object.keys(pending).length){const patch=pending;pending={};clearTimeout(inputTimer);updateSelected(patch);}}
+function renderComparison(){
+  const container=$('#comparison-results');
+  $('#download-comparison').disabled=!comparison;
+  if(!comparison){container.replaceChildren();return;}
+  container.innerHTML='<b>'+t('Same parameters; only sampling changes. CPU builds: one warm-up + three measured.')+'</b><div class="table-scroll"><table><thead><tr><th>'+t('Resolution')+'</th><th>'+t('Top triangles')+'</th><th>'+t('Max per-hole error')+'</th><th>'+t('CPU median / p95')+'</th></tr></thead><tbody>'+comparison.rows.map(r=>`<tr><td>${t(resolutionLabels[r.resolution])}</td><td>${r.triangles.toLocaleString()}</td><td>${(r.maxPerHoleRelativeAreaError*100).toFixed(4)}%</td><td>${r.cpuBuildMs.median.toFixed(2)} / ${r.cpuBuildMs.p95.toFixed(2)} ms</td></tr>`).join('')+'</tbody></table></div>';
+}
 async function compareResolutions(){
   if(busy)throw new Error('Wait for the current operation.');commitPending();const options=getOptions(),rows=[];setBusy(true);
-  try{for(const resolution of ['low','medium','high']){await new Promise(r=>setTimeout(r,0));buildRoad({...options,resolution});const samples=[];let metrics;for(let i=0;i<3;i++){metrics=buildRoad({...options,resolution}).metrics;samples.push(metrics.buildMs);await new Promise(r=>setTimeout(r,0));}rows.push({resolution,triangles:metrics.triangles,borderTriangles:metrics.borderTriangles,area:metrics.measuredArea,maxPerHoleRelativeAreaError:metrics.maxPerHoleRelativeAreaError,cpuBuildMs:summarize(samples),samples});}comparison={parameters:options,rows};
-    $('#comparison-results').innerHTML='<b>Same parameters; only sampling changes. CPU builds: one warm-up + three measured.</b><div class="table-scroll"><table><thead><tr><th>Resolution</th><th>Top triangles</th><th>Max per-hole error</th><th>CPU median / p95</th></tr></thead><tbody>'+rows.map(r=>`<tr><td>${r.resolution}</td><td>${r.triangles.toLocaleString()}</td><td>${(r.maxPerHoleRelativeAreaError*100).toFixed(4)}%</td><td>${r.cpuBuildMs.median.toFixed(2)} / ${r.cpuBuildMs.p95.toFixed(2)} ms</td></tr>`).join('')+'</tbody></table></div>';$('#download-comparison').disabled=false;return comparison;
+  try{for(const resolution of ['low','medium','high']){await new Promise(r=>setTimeout(r,0));buildRoad({...options,resolution});const samples=[];let metrics;for(let i=0;i<3;i++){metrics=buildRoad({...options,resolution}).metrics;samples.push(metrics.buildMs);await new Promise(r=>setTimeout(r,0));}rows.push({resolution,triangles:metrics.triangles,borderTriangles:metrics.borderTriangles,area:metrics.measuredArea,maxPerHoleRelativeAreaError:metrics.maxPerHoleRelativeAreaError,cpuBuildMs:summarize(samples),samples});}comparison={parameters:options,rows};renderComparison();return comparison;
   }finally{setBusy(false);}
 }
-function showBenchmark(result){
+function renderBenchmarkStatus(){
+  const el=$('#benchmark-status');
+  if(benchmarkStatus.kind==='running')el.textContent=t('Warming up shaders, then collecting {frames} frames at 1280 × 720…',{frames:benchmarkStatus.frames});
+  else if(benchmarkStatus.kind==='error')el.textContent=translateError(benchmarkStatus.message);
+  else if(benchmarkStatus.kind==='result'&&lastBenchmark){const r=lastBenchmark;el.textContent=t('{renderer} · {valid}/{frames} valid GPU queries · {discarded} discarded disjoint · 1280 × 720',{renderer:r.identity.renderer,valid:r.gpuQueries.valid,frames:r.protocol.frames,discarded:r.gpuQueries.discardedDisjoint});}
+  else el.textContent=t('No measurement yet. The benchmark briefly pauses interaction.');
+}
+function showBenchmark(result,{updateStatus=true}={}){
+  if(updateStatus)benchmarkStatus={kind:'result'};
+  renderBenchmarkStatus();
   const gpu=result.gpuElapsedMs,memory=result.memory;
-  $('#benchmark-status').textContent=`${result.identity.renderer} · ${result.gpuQueries.valid}/${result.protocol.frames} valid GPU queries · ${result.gpuQueries.discardedDisjoint} discarded disjoint · 1280 × 720`;
   const card=(label,value,note)=>`<div class="benchmark-card"><span>${label}</span><strong>${value}</strong><small>${note}</small></div>`;
-  $('#benchmark-results').innerHTML=card('GPU elapsed',gpu?gpu.median.toFixed(3)+' ms':'Unavailable',gpu?'p95 '+gpu.p95.toFixed(3)+' ms':result.gpuUnavailableReason)+card('CPU render submission',result.cpuSubmitMs.median.toFixed(3)+' ms','p95 '+result.cpuSubmitMs.p95.toFixed(3)+' ms')+card('Model typed arrays',(memory.modelTypedArrays.uniqueViewedBytes/1048576).toFixed(2)+' MiB','Unique storage, counted from actual arrays')+card('Geometry upload estimate',(memory.geometryBufferEstimate.bytes/1048576).toFixed(2)+' MiB','Includes original and border buffers')+'<p>GPU time comes only from timer queries. Frame intervals include browser scheduling. Buffer storage is an estimate, not actual VRAM; JS heap and raw samples are included in the downloaded report.</p>';
+  $('#benchmark-results').innerHTML=card(t('GPU elapsed'),gpu?gpu.median.toFixed(3)+' ms':t('Unavailable'),gpu?'p95 '+gpu.p95.toFixed(3)+' ms':t(result.gpuUnavailableReason))+card(t('CPU render submission'),result.cpuSubmitMs.median.toFixed(3)+' ms','p95 '+result.cpuSubmitMs.p95.toFixed(3)+' ms')+card(t('Model typed arrays'),(memory.modelTypedArrays.uniqueViewedBytes/1048576).toFixed(2)+' MiB',t('Unique storage, counted from actual arrays'))+card(t('Geometry upload estimate'),(memory.geometryBufferEstimate.bytes/1048576).toFixed(2)+' MiB',t('Includes original and border buffers'))+'<p>'+t('GPU time comes only from timer queries. Frame intervals include browser scheduling. Buffer storage is an estimate, not actual VRAM; JS heap and raw samples are included in the downloaded report.')+'</p>';
   $('#download-benchmark').disabled=false;
 }
 async function benchmark({frames=120,warmup=30,buildSamplesMs=[],metadata={},...rest}={}){
   if(busy)throw new Error('Wait for the current operation.');commitPending();
   const saved={paused,animateLight,before,mode,pixelRatio:renderer.getPixelRatio(),size:renderer.getSize(new THREE.Vector2()),aspect:camera.aspect,outline:$('#outline').checked};
-  setBusy(true);paused=true;animateLight=false;before=false;$('#outline').checked=false;setMode(0);renderer.setPixelRatio(1);renderer.setSize(1280,720,false);camera.aspect=1280/720;camera.updateProjectionMatrix();
+  setBusy(true);benchmarkStatus={kind:'running',frames};renderBenchmarkStatus();paused=true;animateLight=false;before=false;$('#outline').checked=false;setMode(0);renderer.setPixelRatio(1);renderer.setSize(1280,720,false);camera.aspect=1280/720;camera.updateProjectionMatrix();
   try{const result=await benchmarkRenderer({renderer,scene,camera,render,model,frames,warmup,buildSamplesMs,metadata:{surface:state.surface,potholes:state.potholes.length,resolution:state.resolution,mesh:state.mesh,shading:material.uniforms.uMaterialDetail.value?'improved':'baseline',parameters:getOptions(),presentation:{lightPreset,wetness:material.uniforms.uWetness.value,lightAngle},...metadata},...rest});lastBenchmark=result;showBenchmark(result);return result;}
+  catch(error){benchmarkStatus={kind:'error',message:error.message};renderBenchmarkStatus();throw error;}
   finally{renderer.setPixelRatio(saved.pixelRatio);renderer.setSize(saved.size.x,saved.size.y,false);camera.aspect=saved.aspect;camera.updateProjectionMatrix();paused=saved.paused;animateLight=saved.animateLight;before=saved.before;$('#outline').checked=saved.outline;setBusy(false);setMode(saved.mode);}
 }
 function flipRows(bytes,w,h){const output=new Uint8Array(bytes.length);for(let y=0;y<h;y++)output.set(bytes.subarray((h-y-1)*w*4,(h-y)*w*4),y*w*4);return output;}
@@ -189,11 +229,11 @@ function bindEvents(){
   $('#random-seed').addEventListener('click',()=>{try{updateSelected({seed:(state.potholes[selected].seed+7919)%1000000});}catch(error){toast(error.message);}});
   $('#add-hole').addEventListener('click',()=>{try{addHole();}catch(error){toast(error.message);}});$('#remove-hole').addEventListener('click',()=>{try{removeHole();}catch(error){toast(error.message);}});
   $('#before').addEventListener('change',e=>setBefore(e.target.checked));$('#outline').addEventListener('change',()=>{applyVisibility();render();});$('#animate-light').addEventListener('change',e=>setLightAnimation(e.target.checked));$('#wetness').addEventListener('input',e=>setWetness(Number(e.target.value)));
-  $('#focus-mode').addEventListener('click',()=>{document.body.classList.toggle('focus');$('#focus-mode').textContent=document.body.classList.contains('focus')?'Restore layout ↙':'Expand view ↗';resize();});
+  $('#focus-mode').addEventListener('click',()=>{document.body.classList.toggle('focus');renderFocusCaption();resize();});
   $('#compare').addEventListener('click',()=>compareResolutions().catch(error=>toast(error.message)));
   $('#download-comparison').addEventListener('click',()=>{if(!comparison)return;const rows=comparison.rows;download('sampling-comparison.csv','resolution,top_triangles,border_triangles,measured_area_m2,max_per_hole_relative_error,cpu_median_ms,cpu_p95_ms\n'+rows.map(r=>[r.resolution,r.triangles,r.borderTriangles,r.area,r.maxPerHoleRelativeAreaError,r.cpuBuildMs.median,r.cpuBuildMs.p95].join(',')).join('\n'),'text/csv');});
   $('#download-section').addEventListener('click',()=>download('analytic-section.csv',sectionCSV(crossSection(state,selected,sectionAxis)),'text/csv'));
-  $('#benchmark').addEventListener('click',()=>{showPanel('performance');$('#benchmark-status').textContent='Warming up shaders, then collecting 120 frames at 1280 × 720…';benchmark().catch(error=>{$('#benchmark-status').textContent=error.message;toast(error.message);});});
+  $('#benchmark').addEventListener('click',()=>{showPanel('performance');benchmark().catch(error=>toast(error.message));});
   $('#download-benchmark').addEventListener('click',()=>{if(lastBenchmark)download('performance.json',lastBenchmark);});
   $('#export').addEventListener('click',()=>exportBundle().catch(error=>toast(error.message)));
   $('#save-scene').addEventListener('click',()=>{commitPending();download('pothole-scene.json',getOptions());});$('#load-scene').addEventListener('click',()=>$('#scene-file').click());
@@ -205,9 +245,11 @@ function init(){
   material=new THREE.ShaderMaterial({vertexShader,fragmentShader,side:THREE.DoubleSide,uniforms:{uMode:{value:0},uDepth:{value:.36},uNear:{value:.1},uFar:{value:50},uLight:{value:new THREE.Vector3()},uAmbient:{value:.30},uLightIntensity:{value:1.35},uBefore:{value:0},uAggregateScale:{value:1},uWetness:{value:0},uMaterialDetail:{value:1}}});
   controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=false;controls.addEventListener('change',()=>{if(!busy)render();});
   bindEvents();rebuild();setCameraView('wide');new ResizeObserver(resize).observe($('#viewport'));resize();$('#loading').remove();
-  const identity=rendererIdentity(renderer);$('#render-status').textContent=`${identity.classification==='hardware-identified'?'Hardware WebGL':identity.classification==='software'?'Software WebGL':'WebGL renderer'} · ${identity.timerExtensionAvailable?'GPU timer available':'GPU timer unavailable'}`;
-  let frames=0,last=performance.now();function frame(now){if(!paused&&!busy){render();frames++;}if(now-last>1400){$('#live-fps').textContent=`${(frames*1000/(now-last)).toFixed(0)} FPS · current browser, not GPU time`;frames=0;last=now;}requestAnimationFrame(frame);}requestAnimationFrame(frame);
+  renderIdentity=rendererIdentity(renderer);renderRenderStatus();renderModeCaption();
+  let frames=0,last=performance.now();function frame(now){if(!paused&&!busy){render();frames++;}if(now-last>1400){currentFps=(frames*1000/(now-last)).toFixed(0);renderFps();frames=0;last=now;}requestAnimationFrame(frame);}requestAnimationFrame(frame);
   window.potholeLab={get options(){return getOptions();},get model(){return model;},get metrics(){return model.metrics;},get renderer(){return renderer;},get camera(){return camera;},get scene(){return scene;},get selected(){return selected;},get comparison(){return comparison;},get performance(){return lastBenchmark;},get presentation(){return {view,lightPreset,before,animateLight,lightAngle,materialDetail:material.uniforms.uMaterialDetail.value,wetness:material.uniforms.uWetness.value};},rebuild,loadPreset,selectHole,updateSelected,addHole,removeHole,setMode,setBefore,setCameraView,setLighting,setMaterialDetail,setWetness,setLightAnimation,setLightAngle,showPanel,render,resize,pause,resume,benchmark,compareResolutions,exportBundle,crossSection:()=>crossSection(state,selected,sectionAxis)};
   window.dispatchEvent(new Event('pothole-ready'));
 }
-try{init();}catch(error){console.error(error);if($('#loading'))$('#loading').textContent='Initialization failed: '+error.message;}
+initI18n();
+window.addEventListener('pothole-language-change',refreshLanguage);
+try{init();}catch(error){console.error(error);initializationError=error.message;if($('#loading'))$('#loading').textContent=t('Initialization failed: {error}',{error:translateError(error.message)});}

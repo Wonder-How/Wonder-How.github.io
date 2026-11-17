@@ -1,21 +1,21 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-11-17T12:46:06.782183+00:00",
+  "schemaVersion": 3,
+  "generatedAt": "2026-11-17T13:49:25.938936+00:00",
   "intendedUrl": "https://wonderhow.site/5411_demo/",
   "entryPoint": "index.html",
   "sourceProject": "pothole-final",
-  "payloadFiles": 17,
-  "totalPayloadBytes": 2176352,
+  "payloadFiles": 18,
+  "totalPayloadBytes": 2204120,
   "files": [
     {
       "path": "help.html",
-      "bytes": 3974,
-      "sha256": "0e7f50f870ea2dab0ee3608fa18425f2e0d9ea4b230efec7519dbe71c312c409"
+      "bytes": 8910,
+      "sha256": "8c705fd9dadf63c7aa5ec8ca7bada05de4290e7656582f282c2d4237caff20b5"
     },
     {
       "path": "index.html",
-      "bytes": 9315,
-      "sha256": "cba9650c81189036f150c5d5f816414c5cf4098c24fe8bb1dbdece935248366e"
+      "bytes": 9461,
+      "sha256": "a8aa0665ff7f755328a1db63f2583b5c2b6cc206f17646b65976999e8b4119be"
     },
     {
       "path": "lib/OrbitControls.js",
@@ -39,8 +39,8 @@
     },
     {
       "path": "src/app.mjs",
-      "bytes": 31585,
-      "sha256": "13f332f56856dc5f342c97419c1ca22d8e10a3e0a0ea5e83c8d33fedfb0e8d9f"
+      "bytes": 34371,
+      "sha256": "4fba02fb3c1038e6c9d7450173e3d546bb92376379cb5a10e95ed2c563fb7b4b"
     },
     {
       "path": "src/comparison.mjs",
@@ -63,9 +63,14 @@
       "sha256": "ccb7185adefca9f442df7dd7cca57a39fae7ccfce84f7e32edf25ec8e8aa2947"
     },
     {
+      "path": "src/i18n.mjs",
+      "bytes": 19178,
+      "sha256": "12a81e58bc62d2be128d2bfd1ee986e164759fbcd6204647362d166383e6969a"
+    },
+    {
       "path": "src/inspection.mjs",
-      "bytes": 2068,
-      "sha256": "73a9659715a57c9bd399aec8e7ed255e362f1d50fba9306b638f8db24fc7639f"
+      "bytes": 2136,
+      "sha256": "8cb708f85ce8f326cf294df3e4d7039f7bfafa26b1825a141b22c2311099f008"
     },
     {
       "path": "src/performance.mjs",
@@ -89,8 +94,8 @@
     },
     {
       "path": "style.css",
-      "bytes": 12265,
-      "sha256": "b8be86a125f456e7cdc31c14643db44e0728344b8c23c0a708feff8dd9a72793"
+      "bytes": 12919,
+      "sha256": "cc908588cb0e1992cf19d4e9d657e02ec9eb503b7f588cd10e4ad8cf6fa59646"
     }
   ],
   "validation": {
@@ -98,7 +103,7 @@
     "resolvedReferences": [
       {
         "from": "index.html",
-        "ref": "style.css",
+        "ref": "style.css?v=2",
         "resolvedPath": "style.css"
       },
       {
@@ -108,17 +113,17 @@
       },
       {
         "from": "index.html",
-        "ref": "help.html",
+        "ref": "help.html?v=2",
         "resolvedPath": "help.html"
       },
       {
         "from": "index.html",
-        "ref": "src/app.mjs",
+        "ref": "src/app.mjs?v=2",
         "resolvedPath": "src/app.mjs"
       },
       {
         "from": "help.html",
-        "ref": "style.css",
+        "ref": "style.css?v=2",
         "resolvedPath": "style.css"
       },
       {
@@ -130,6 +135,16 @@
         "from": "help.html",
         "ref": "./",
         "resolvedPath": "index.html"
+      },
+      {
+        "from": "help.html",
+        "ref": "./",
+        "resolvedPath": "index.html"
+      },
+      {
+        "from": "help.html",
+        "ref": "./src/i18n.mjs",
+        "resolvedPath": "src/i18n.mjs"
       },
       {
         "from": "src/geometry-final.mjs",
@@ -162,8 +177,13 @@
         "resolvedPath": "src/geometry.mjs"
       },
       {
-        "from": "src/app.mjs",
-        "ref": "three",
+        "from": "src/inspection.mjs",
+        "ref": "./i18n.mjs",
+        "resolvedPath": "src/i18n.mjs"
+      },
+      {
+        "from": "index.html",
+        "ref": "./lib/three.module.js",
         "resolvedPath": "lib/three.module.js"
       },
       {
@@ -193,7 +213,7 @@
       },
       {
         "from": "src/app.mjs",
-        "ref": "./inspection.mjs",
+        "ref": "./inspection.mjs?v=2",
         "resolvedPath": "src/inspection.mjs"
       },
       {
@@ -202,9 +222,9 @@
         "resolvedPath": "src/zip.mjs"
       },
       {
-        "from": "lib/three.module.js",
-        "ref": "./three.core.js",
-        "resolvedPath": "lib/three.core.js"
+        "from": "src/app.mjs",
+        "ref": "./i18n.mjs",
+        "resolvedPath": "src/i18n.mjs"
       },
       {
         "from": "lib/three.module.js",
@@ -212,8 +232,13 @@
         "resolvedPath": "lib/three.core.js"
       },
       {
-        "from": "lib/OrbitControls.js",
-        "ref": "three",
+        "from": "lib/three.module.js",
+        "ref": "./three.core.js",
+        "resolvedPath": "lib/three.core.js"
+      },
+      {
+        "from": "index.html",
+        "ref": "./lib/three.module.js",
         "resolvedPath": "lib/three.module.js"
       }
     ],
@@ -223,6 +248,7 @@
       "src/shaders.mjs",
       "src/geometry-final.mjs",
       "src/zip.mjs",
+      "src/i18n.mjs",
       "src/geometry.mjs",
       "src/geometry-legacy.mjs",
       "src/scenes.mjs",
@@ -263,6 +289,17 @@
       "httpErrors": 0,
       "ownedServerStopped": true,
       "evidence": "Local QA artifacts retained outside the public payload"
+    },
+    "bilingualSmoke": {
+      "status": "passed",
+      "preservesSceneState": true,
+      "persistsLanguagePreference": true,
+      "crossTabSync": true,
+      "desktopWidth": 1440,
+      "mobileWidth": 390,
+      "horizontalOverflow": false,
+      "browserErrors": 0,
+      "evidence": "QA retained outside public payload"
     }
   },
   "githubPagesCompatibility": {
@@ -282,5 +319,15 @@
     "No server-side process, API key, package installation or external CDN is required."
   ],
   "scope": "Runtime demo and short public usage guide only. The original project, report, appendices, raw measurements, source archive, recordings and slide deck were not copied.",
-  "manifestHashNote": "This manifest lists and hashes every payload file; the manifest itself is excluded to avoid a self-referential hash."
+  "manifestHashNote": "This manifest lists and hashes every payload file; the manifest itself is excluded to avoid a self-referential hash.",
+  "localization": {
+    "languages": [
+      "en",
+      "zh"
+    ],
+    "default": "en",
+    "preferenceStorage": "localStorage",
+    "externalTranslationService": false,
+    "coverage": "Static controls, dynamic statuses/results/errors, cross-section and usage guide"
+  }
 }

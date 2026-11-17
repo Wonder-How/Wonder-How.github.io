@@ -1,4 +1,5 @@
 import {sampleCrossSection} from './geometry.mjs';
+import {t} from './i18n.mjs';
 
 export function crossSection(options,selected=0,axis='u'){
   const hole=options.potholes[selected],value=hole.origin[axis==='u'?'v':'u'];
@@ -13,6 +14,6 @@ export function sectionSVG(rows,axis){
   const path=(key,reverse=false)=>[...(reverse?[...rows].reverse():rows)].map((p,i)=>`${i?'L':'M'}${px(p[axis]).toFixed(2)},${py(p[key][1]).toFixed(2)}`).join(' ');
   let grid='';for(let i=0;i<=4;i++){const value=ymin+(ymax-ymin)*i/4,y=py(value);grid+=`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="#2e3d44"/><text x="${pad.l-11}" y="${y+4}" text-anchor="end" fill="#9aadb4" font-size="11">${value.toFixed(2)}</text>`;}
   for(let i=0;i<=6;i++){const value=xmin+(xmax-xmin)*i/6;grid+=`<text x="${px(value)}" y="${H-15}" text-anchor="middle" fill="#9aadb4" font-size="11">${value.toFixed(1)}</text>`;}
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Analytic original and displaced road cross-section"><title>Analytic cross-section, metres</title>${grid}<path d="${path('source')}" fill="none" stroke="#a1b4bd" stroke-dasharray="6 5" stroke-width="2"/><path d="${path('deformed')}" fill="none" stroke="#d0e779" stroke-width="2.5"/><text x="${W-25}" y="${H-3}" text-anchor="end" fill="#9aadb4" font-size="10">source ${axis} (m)</text><text x="8" y="13" fill="#9aadb4" font-size="10">height (m)</text></svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('Analytic original and displaced road cross-section')}"><title>${t('Analytic cross-section, metres')}</title>${grid}<path d="${path('source')}" fill="none" stroke="#a1b4bd" stroke-dasharray="6 5" stroke-width="2"/><path d="${path('deformed')}" fill="none" stroke="#d0e779" stroke-width="2.5"/><text x="${W-25}" y="${H-3}" text-anchor="end" fill="#9aadb4" font-size="10">${t('source {axis} (m)',{axis})}</text><text x="8" y="13" fill="#9aadb4" font-size="10">${t('height (m)')}</text></svg>`;
 }
 export function sectionCSV(rows){return 'u,v,source_x,source_y,source_z,deformed_x,deformed_y,deformed_z,normal_displacement_m,hole_id\n'+rows.map(p=>[p.u,p.v,...p.source,...p.deformed,p.depth,p.holeId].join(',')).join('\n')+'\n';}

@@ -3,10 +3,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Controlled pothole footprints, local refinement and measured WebGL rendering.">
 <link rel="icon" href="data:,">
-<title>Pothole Lab · Final · Group 19</title><link rel="stylesheet" href="style.css">
+<title>Pothole Lab · Final · Group 19</title><link rel="stylesheet" href="style.css?v=2">
 <script type="importmap">{"imports":{"three":"./lib/three.module.js"}}</script>
 </head><body>
-<header><a class="brand" href="./"><b>P<span>·</span></b><span>POTHOLE LAB<small>COMP5411 / GROUP 19</small></span></a><div class="header-right"><i></i><span>FINAL / v1.0</span><a href="help.html" target="_blank" rel="noopener">How to use ↗</a></div></header>
+<header><a class="brand" href="./"><b>P<span>·</span></b><span>POTHOLE LAB<small>COMP5411 / GROUP 19</small></span></a><div class="header-right"><i></i><span>FINAL / v1.0</span><button id="language-toggle" class="language-toggle" type="button" aria-label="Switch to Chinese" aria-pressed="false">中文</button><a href="help.html?v=2" target="_blank" rel="noopener">How to use ↗</a></div></header>
 <main><aside>
 <div class="eyebrow">SURFACE-AWARE GENERATION</div><h1>One surface.<br>Multiple potholes.</h1><p class="intro">Control the damaged area on the original road, then inspect the geometry and its cost.</p>
 <section><div class="section-heading"><span>01</span><h2>Scene</h2></div>
@@ -36,4 +36,4 @@
 <section id="panel-section" class="inspection-panel" hidden><div class="panel-heading"><div><h3>A direct view of the depth profile.</h3><p>Analytic source-coordinate section through the selected pothole. Dashed = original road; solid = displaced profile.</p></div><div class="segmented" id="section-axis"><button data-axis="u" class="active">Across u</button><button data-axis="v">Along v</button></div><button id="download-section">CSV ↓</button></div><div id="cross-section" class="cross-section"></div></section>
 <section id="panel-performance" class="inspection-panel" hidden><div class="panel-heading"><div><h3>Measure the render, not just the frame counter.</h3><p>Fixed 1280 × 720 · GPU timer queries · CPU submit time · buffer memory. Hardware and software renderers are identified explicitly.</p></div><button class="primary" id="benchmark">Run 120-frame benchmark</button><button id="download-benchmark" disabled>JSON ↓</button></div><div id="benchmark-status" class="status" role="status">No measurement yet. The benchmark briefly pauses interaction.</div><div id="benchmark-results" class="benchmark-results"></div></section>
 <footer><span>WANG Dehao · PENG Shangpin · COMP5411 Group 19</span><span id="scene-summary">One surface, independently controlled potholes.</span></footer>
-</div></main><div id="toast" role="status" aria-live="polite"></div><script type="module" src="src/app.mjs"></script></body></html>
+</div></main><div id="toast" role="status" aria-live="polite"></div><script type="module" src="src/app.mjs?v=2"></script></body></html>

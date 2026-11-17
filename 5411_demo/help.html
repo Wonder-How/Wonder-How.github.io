@@ -5,11 +5,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pothole Lab · How to use</title>
 <meta name="description" content="A quick guide to the interactive Pothole Lab demo.">
-<link rel="stylesheet" href="style.css">
-<style>body{max-width:850px;margin:0 auto;padding:35px 24px 60px;line-height:1.8}h1{font-size:34px;margin-top:25px}h2{font-size:20px;margin-top:30px;color:var(--lime)}p,li{color:#bdcbd0;font-size:14px}li{margin:9px 0}a{color:var(--lime)}strong{color:var(--text)}.back{font-size:13px}.note{border:1px solid var(--line);padding:16px 20px;border-radius:6px;background:var(--panel)}</style>
+<link rel="stylesheet" href="style.css?v=2">
+<style>
+body{max-width:850px;margin:0 auto;padding:35px 24px 60px;line-height:1.8}
+h1{font-size:34px;margin-top:25px;line-height:1.35;overflow-wrap:anywhere}
+main{display:block;min-height:0}
+h2{font-size:20px;margin-top:30px;color:var(--lime)}
+p,li{color:#bdcbd0;font-size:14px;overflow-wrap:anywhere}
+li{margin:9px 0}a{color:var(--lime)}strong{color:var(--text)}
+.help-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.back{font-size:13px}.note{border:1px solid var(--line);padding:16px 20px;border-radius:6px;background:var(--panel)}
+#language-toggle{flex:none;min-width:88px;min-height:38px;padding:7px 14px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px;cursor:pointer}
+#language-toggle:hover{border-color:var(--lime)}
+#language-toggle:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+[hidden]{display:none!important}
+@media(max-width:480px){body{padding:24px 18px 40px}h1{font-size:28px}.note{padding:12px 14px}ol,ul{padding-left:22px}}
+</style>
 </head>
 <body>
+<header class="help-header">
 <a class="back" href="./">← Back to the demo</a>
+<button id="language-toggle" type="button" aria-label="Switch to Chinese">中文</button>
+</header>
+<main>
+<article data-help-lang="en" lang="en">
 <div class="eyebrow" style="margin-top:28px">POTHOLE LAB</div>
 <h1>Try the road. Change one pothole.</h1>
 <p>This interactive demo lets you place up to eight potholes on a flat, sloped or curved road, adjust each pothole and inspect the result.</p>
@@ -35,5 +54,50 @@
 <p>Use a modern browser with WebGL 2 and hardware acceleration enabled. Rendering speed depends on your device and browser. GPU timing may be unavailable; the performance panel reports this explicitly. High sampling levels and exports can take longer on slower devices.</p>
 <p>The demo uses analytic road surfaces. It does not import arbitrary terrain or simulate vehicle dynamics. Potholes whose support regions overlap are rejected, and the last valid scene is retained. With road-edge mode enabled, the area target applies to the footprint remaining on the road.</p>
 <p><a href="./">Open Pothole Lab →</a></p>
+</article>
+<article data-help-lang="zh" lang="zh-CN" hidden>
+<div class="eyebrow" style="margin-top:28px">POTHOLE LAB</div>
+<h1>体验路面，调整每一处坑洞。</h1>
+<p>在这个交互演示中，你可以在平坦、倾斜或弯曲的路面上放置最多八个坑洞，分别调整它们的参数，并查看生成结果。</p>
+<h2>快速上手</h2>
+<ol>
+<li>保留默认的<strong>四个不同的坑洞</strong>示例，或在<strong>可复现的示例</strong>中选择其他场景。</li>
+<li>在左侧面板选择一个坑洞。调整<strong>目标覆盖面积</strong>（面积）、<strong>最大坑深</strong>（深度）和<strong>轮廓不规则度</strong>（外缘形状）。<strong>横向位置 u</strong>和<strong>纵向位置 v</strong>分别控制坑洞沿路面宽度和长度方向的位置。</li>
+<li>点击<strong>近景</strong>观察选中的坑洞，点击<strong>俯视</strong>从上方查看，或点击<strong>全景</strong>查看整段路面。</li>
+<li>试试<strong>平面</strong>、<strong>斜坡</strong>和<strong>曲面</strong>路面。选择<strong>路边破损</strong>示例，可以查看延伸到路面边界外的坑洞。</li>
+</ol>
+<p class="note"><strong>鼠标操作：</strong>按住左键拖动可旋转视角，滚动滚轮可缩放，按住右键拖动可平移。触屏设备上，用单指拖动旋转，用双指缩放或平移。</p>
+<h2>检查与保存</h2>
+<ul>
+<li><strong>线框</strong>显示三角网格；<strong>法线</strong>、<strong>掩膜</strong>、<strong>深度</strong>和<strong>实例</strong>分别提供相应的检查视图。</li>
+<li><strong>原始路面</strong>可切换显示未损坏的路面。<strong>截面</strong>显示穿过选中坑洞的剖面曲线，可以在横向和纵向之间切换。</li>
+<li><strong>采样精度</strong>和<strong>网格构建方式</strong>用于调整几何分辨率和网格布局。<strong>比较采样精度</strong>会在三种分辨率下测量同一个场景。</li>
+<li><strong>保存场景</strong>会将当前参数下载为 JSON 文件；<strong>载入场景</strong>可恢复之前保存的场景。</li>
+<li><strong>导出对齐的数据集</strong>会下载一个 ZIP 文件，其中包含当前视角的 RGB 图像、掩膜、实例编号、几何法线、以米为单位的相机深度，以及场景与相机的元数据。请先关闭<strong>原始路面</strong>，以启用导出。</li>
+</ul>
+<h2>测量数值的含义</h2>
+<p>覆盖面积是在原始、未损坏的路面上测量的。坑洞深度指沿原始路面法线方向的凹陷量。导出的相机深度沿相机观察轴测量，与坑洞凹陷深度是两个不同的量。</p>
+<h2>功能限制与浏览器要求</h2>
+<p>请使用支持 WebGL 2 且已开启硬件加速的现代浏览器。渲染速度取决于设备和浏览器。GPU 计时可能不可用，性能面板会明确提示。较高的采样精度和数据导出在较慢的设备上可能需要更长时间。</p>
+<p>本演示使用解析定义的路面曲面，不支持导入任意地形，也不模拟车辆动力学。如果坑洞的作用范围相互重叠，系统会拒绝此次修改并保留上一个有效场景。启用边缘模式时，目标覆盖面积指坑洞留在路面范围内的部分。</p>
+<p><a href="./">打开 Pothole Lab →</a></p>
+</article>
+</main>
+<script type="module">
+import { initI18n, getLanguage } from './src/i18n.mjs';
+function syncHelpLanguage() {
+  const language = getLanguage();
+  for (const section of document.querySelectorAll('[data-help-lang]')) {
+    section.hidden = section.dataset.helpLang !== language;
+  }
+  document.title = language === 'zh' ? 'Pothole Lab · 操作说明' : 'Pothole Lab · How to use';
+  document.querySelector('meta[name="description"]').content = language === 'zh'
+    ? 'Pothole Lab 交互式坑洞演示的快速操作指南。'
+    : 'A quick guide to the interactive Pothole Lab demo.';
+}
+initI18n();
+syncHelpLanguage();
+window.addEventListener('pothole-language-change', syncHelpLanguage);
+</script>
 </body>
 </html>
