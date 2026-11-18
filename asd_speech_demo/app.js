@@ -41,7 +41,7 @@ const englishRules = {
   "A5": "A 2\u20135-word sequence in at least three utterances within this clip; unique utterances counted.",
   "B6": "A social initiation with laughter or another positive non-speech vocalization in the same utterance.",
   "B7": "First child vocal response within 0\u20133 seconds after an adult name mention, labeled Social 3.2; counted by episode.",
-  "B10": "Requests in the vocal subset; explicit AAC-source utterances excluded.",
+  "B10": "Requests expressed through the child's voice; device-generated utterances excluded.",
   "B15": "Same evidence as A2; do not add these counts together.",
   "B16b": "Attention bids or showing/sharing in caregiver\u2013child interaction; proxy candidate.",
   "E2": "Crying or other negative non-speech vocalization; each utterance counted once."
@@ -115,7 +115,7 @@ function selectRecording(id) {
   error('');
   state.media = video; video.hidden = false; $('mediaFallback').hidden = true;
   video.src = r.video_url || `./media/video/${encodeURIComponent(id)}`;
-  $('mediaBadge').textContent = r.annotated ? 'Video' : 'Unannotated';
+  $('mediaBadge').textContent = r.source_range ? `${timeText(r.source_range.start)}–${timeText(r.source_range.end)}` : r.annotated ? 'Video' : 'Unannotated';
   video.playbackRate = Number($('speed').value); video.muted = false;
   for (const name of ['playPause','back5','forward5','speed']) $(name).disabled = false;
   renderCards(); renderTimeline(); renderEvidence(); updateTime(0);
@@ -161,7 +161,7 @@ function renderEvidence() {
   $('evidencePanel').hidden = !d;
   if (!d) {
     $('events').replaceChildren(); $('eventSummary').textContent = '';
-    $('evidenceTitle').textContent = 'Select a symptom or behavior';
+    $('evidenceTitle').textContent = 'Select a symptom';
     $('prevEvent').disabled = true; $('nextEvent').disabled = true; return;
   }
   $('evidenceTitle').textContent = `${prettyCode(d.code)} · ${d.label}`;
@@ -308,7 +308,7 @@ async function init() {
     const childIds = new Set(recordings.map(r => r.child));
     state.data = {...catalog,recordings,children:catalog.children.filter(c => childIds.has(c.id))};
     const query = new URLSearchParams(location.search);
-    if (query.get('view') === 'behaviors') state.taxonomy = 'behaviors';
+    if (query.get('view') === 'behaviors' && state.data.taxonomies.behaviors) state.taxonomy = 'behaviors';
     document.querySelectorAll('[data-taxonomy]').forEach(b => { const selected = b.dataset.taxonomy === state.taxonomy; b.classList.toggle('selected',selected); b.setAttribute('aria-pressed',String(selected)); });
     renderChildren();
     if (!state.data.children.length) {
