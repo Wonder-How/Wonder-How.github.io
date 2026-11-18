@@ -34,7 +34,7 @@ const englishLabels = {
 };
 const englishRules = {
   "A1": "Word-supported speech excluding responses, echolalia and imitation; task speech is separate.",
-  "A1a": "Candidate from vowel/CV-like transcription; not acoustically verified.",
+  "A1a": "Inferred from vowel/CV-like transcription; not acoustically verified.",
   "A2": "Requests, attention bids, showing/sharing and other social initiations. Shares evidence with B15.",
   "A9": "Self-talk (Social 3.1).",
   "A4": "Social 3.7; adult matching supports but does not determine inclusion.",
@@ -43,10 +43,10 @@ const englishRules = {
   "B7": "First child vocal response within 0\u20133 seconds after an adult name mention, labeled Social 3.2; counted by episode.",
   "B10": "Requests expressed through the child's voice; device-generated utterances excluded.",
   "B15": "Same evidence as A2; do not add these counts together.",
-  "B16b": "Attention bids or showing/sharing in caregiver\u2013child interaction; proxy candidate.",
+  "B16b": "Attention bids or showing/sharing in caregiver\u2013child interaction; proxy mapping.",
   "E2": "Crying or other negative non-speech vocalization; each utterance counted once."
 };
-const state = {data:null, recording:null, child:null, taxonomy:'symptoms', code:null, event:null, media:null, frame:0, pendingSeek:null, liveSignature:''};
+const state = {data:null, recording:null, child:null, taxonomy:'symptoms', code:null, event:null, media:null, frame:0, pendingSeek:null, liveSignature:'', dialogueSignature:null, autoplayPending:false};
 const timed = event => Number.isFinite(event.start) && Number.isFinite(event.end) && event.start >= 0 && event.end > event.start;
 const inRange = (event, time) => timed(event) && event.start <= time && time < event.end;
 const labelCount = value => value == null ? '—' : String(value);
@@ -109,7 +109,7 @@ function selectRecording(id) {
   state.recording = r;
   state.child = state.data.children.find(c => c.id === r.child);
   $('childSelect').value = r.child;
-  state.code = null; state.event = null; state.pendingSeek = null; state.liveSignature = '';
+  state.code = null; state.event = null; state.pendingSeek = null; state.liveSignature = ''; state.dialogueSignature = null; state.autoplayPending = true;
   $('recordingSelect').value = id;
   $('recordingTitle').textContent = id;
   error('');
@@ -117,6 +117,7 @@ function selectRecording(id) {
   video.src = r.video_url || `./media/video/${encodeURIComponent(id)}`;
   $('mediaBadge').textContent = r.source_range ? `${timeText(r.source_range.start)}–${timeText(r.source_range.end)}` : r.annotated ? 'Video' : 'Unannotated';
   video.playbackRate = Number($('speed').value); video.muted = false;
+  $('enableSound').hidden = true;
   for (const name of ['playPause','back5','forward5','speed']) $(name).disabled = false;
   renderCards(); renderTimeline(); renderEvidence(); updateTime(0);
   const url = new URL(location.href); url.searchParams.set('child',state.child.id); url.searchParams.set('recording',r.id); url.searchParams.set('view',state.taxonomy); history.replaceState(null,'',url);
@@ -127,7 +128,7 @@ function renderCards() {
   $('symptomCards').innerHTML = definitions().map((d,i) => {
     const count = state.recording.counts[state.taxonomy][d.code];
     const accent = '#16766d', tint = '#eaf7f3';
-    return `<button class="symptom-card${state.code === d.code ? ' selected' : ''}" data-code="${esc(d.code)}" data-index="${i}" aria-pressed="${state.code === d.code}" style="--accent:${accent};--tint:${tint}" title="${esc(d.rule)}"><span class="card-content"><span class="card-label">${esc(d.label)}${d.candidate ? '<span class="candidate">Candidate</span>' : ''}</span><span class="card-meta"><span class="card-code">${esc(prettyCode(d.code))}</span></span></span><span class="card-total" title="${count == null ? 'Not annotated' : 'Occurrences in this clip'}"><strong>${labelCount(count)}</strong></span></button>`;
+    return `<button class="symptom-card${state.code === d.code ? ' selected' : ''}" data-code="${esc(d.code)}" data-index="${i}" aria-pressed="${state.code === d.code}" style="--accent:${accent};--tint:${tint}" title="${esc(d.rule)}"><span class="card-content"><span class="card-label">${esc(d.label)}</span><span class="card-meta"><span class="card-code">${esc(prettyCode(d.code))}</span></span></span><span class="card-total" title="${count == null ? 'Not annotated' : 'Occurrences in this clip'}"><strong>${labelCount(count)}</strong></span></button>`;
   }).join('');
   $('symptomCards').scrollTop = 0;
   $('symptomCards').querySelectorAll('button').forEach(button => button.addEventListener('click', () => selectCode(button.dataset.code)));
@@ -142,7 +143,7 @@ function selectCode(code) {
 
 function renderTimeline() {
   const seconds = duration(), defs = definitions();
-  const visible = defs.filter(d => state.recording.events.some(e => timed(e) && e.codes[state.taxonomy].includes(d.code)));
+  const visible = defs;
   $('timelineCount').textContent = `(${visible.length})`;
   $('timelineEnd').textContent = timeText(seconds);
   $('timeline').innerHTML = visible.length && seconds ? visible.map(d => {
@@ -207,7 +208,7 @@ function updateTime(time = state.media?.currentTime || 0) {
   $('symptomCards').querySelectorAll('.symptom-card').forEach(card => {
     const active = activeCodes.has(card.dataset.code); card.classList.toggle('active',active);
     const d = definitionForCode(card.dataset.code), count = state.recording.counts[state.taxonomy][card.dataset.code];
-    const label = `${d.label}${d.candidate ? ', candidate' : ''}, ${count == null ? 'not annotated' : `${count} in this clip`}, ${active ? 'active now' : 'inactive'}`;
+    const label = `${d.label}, ${count == null ? 'not annotated' : `${count} in this clip`}, ${active ? 'active now' : 'inactive'}`;
     if (card.getAttribute('aria-label') !== label) card.setAttribute('aria-label',label);
   });
   orderCards(time,activeCodes);
@@ -221,8 +222,34 @@ function updateTime(time = state.media?.currentTime || 0) {
     $('liveText').textContent = !state.media ? 'Video unavailable' : activeCodes.size ? definitions().filter(d => activeCodes.has(d.code)).map(d => d.label).join(' · ') : state.recording.annotated ? 'No active annotations' : 'Unannotated clip';
     $('activeCount').textContent = String(activeCodes.size);
     $('liveDot').classList.toggle('on',activeCodes.size > 0);
-    const texts = [...new Set(activeEvents.filter(e => e.text).map(e => e.text))];
-    $('transcript').textContent = texts.join(' / ') || '—';
+  }
+  updateDialogue(time);
+}
+
+function updateDialogue(time) {
+  const transcripts = state.recording.transcripts || state.recording.events.map(e => ({...e,speaker:'Child'}));
+  const active = transcripts.filter(e => inRange(e,time));
+  const signature = active.map(e => e.id).join('|');
+  if (signature === state.dialogueSignature) return;
+  state.dialogueSignature = signature;
+  for (const speaker of ['Child','Adult']) {
+    const items = active.filter(e => e.speaker === speaker && e.text);
+    const node = $(speaker === 'Child' ? 'childTranscript' : 'adultTranscript');
+    node.textContent = items.map(e => e.text).join(' / ') || '—';
+    node.closest('.dialogue-row').classList.toggle('active',items.length > 0);
+  }
+}
+
+async function autoplay(media) {
+  if (!state.autoplayPending || media !== state.media) return;
+  state.autoplayPending = false;
+  const recording = state.recording;
+  try { await media.play(); }
+  catch (e) {
+    if (e.name !== 'NotAllowedError' || recording !== state.recording) return;
+    media.muted = true;
+    $('enableSound').hidden = false;
+    try { await media.play(); } catch {}
   }
 }
 
@@ -269,7 +296,9 @@ for (const media of [$('video')]) {
   media.addEventListener('loadeddata', () => {
     if (media !== state.media) return;
     if (media === $('video') && media.videoWidth === 0) error('Video decoding failed. Refresh after a compatible video copy is available.');
+    autoplay(media);
   });
+  media.addEventListener('volumechange', () => { $('enableSound').hidden = !media.muted; });
   for (const name of ['timeupdate','seeked','seeking','pause','ended']) media.addEventListener(name, () => { if (media === state.media) updateTime(); });
   media.addEventListener('play', () => { if (media === state.media) { cancelAnimationFrame(state.frame); animationLoop(); } });
   media.addEventListener('ratechange', () => { if (media === state.media) $('speed').value = String(media.playbackRate); });
@@ -279,6 +308,7 @@ $('childSelect').addEventListener('change',e => selectChild(e.target.value));
 $('recordingSelect').addEventListener('change',e => selectRecording(e.target.value));
 $('nextRecording').addEventListener('click',() => { if (!state.recording) return; const files = availableRecordings(), index = files.findIndex(r => r.id === state.recording.id); selectRecording(files[(index+1)%files.length].id); });
 $('playPause').addEventListener('click',togglePlay);
+$('enableSound').addEventListener('click',() => { if (state.media) { state.media.muted = false; safePlay(); } });
 $('back5').addEventListener('click',() => seek((state.media?.currentTime || 0)-5));
 $('forward5').addEventListener('click',() => seek((state.media?.currentTime || 0)+5));
 $('speed').addEventListener('change',e => { if (state.media) state.media.playbackRate = Number(e.target.value); });
