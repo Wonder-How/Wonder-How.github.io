@@ -4,15 +4,17 @@ import {buildRoad,surfaceSample} from './geometry.mjs';
 import {vertexShader,fragmentShader} from './shaders.mjs';
 import {benchmarkRenderer,rendererIdentity,summarize} from './performance.mjs';
 import {scenePreset,clone} from './scenes.mjs';
-import {crossSection,sectionSVG,sectionCSV} from './inspection.mjs?v=2';
+import {crossSection,sectionSVG,sectionCSV} from './inspection.mjs?v=3';
 import {zipStore} from './zip.mjs';
-import {t,initI18n,translateError} from './i18n.mjs';
+import {t,initI18n,translateError} from './i18n.mjs?v=3';
+import {MATERIAL_PRESETS,DEFAULT_MATERIAL_PRESET,getMaterialPreset} from './materials.mjs';
 
 const $=selector=>document.querySelector(selector);
 const state=scenePreset('varied');
 const lighting={raking:{direction:[-.85,.55,.5],ambient:.30,intensity:1.35},soft:{direction:[-.4,1,.65],ambient:.54,intensity:.80}};
 let renderer,scene,camera,controls,material,model,damagedGroup,originalGroup,outlineGroup;
 let selected=0,mode=0,view='wide',lightPreset='raking',before=false,paused=false,busy=false,animateLight=false,lightAngle=0;
+let materialPreset=DEFAULT_MATERIAL_PRESET;
 let comparison=null,lastBenchmark=null,sectionAxis='u',pending={},inputTimer,toastTimer,presetName='varied';
 let placementError=null,lastToast=null,renderIdentity=null,currentFps=null,initializationError=null;
 let benchmarkStatus={kind:'idle'};
@@ -116,7 +118,7 @@ function renderFocusCaption(){$('#focus-mode').textContent=t(document.body.class
 function renderRenderStatus(){if(renderIdentity)$('#render-status').textContent=t('{renderer} · {timer}',{renderer:t(renderIdentity.classification==='hardware-identified'?'Hardware WebGL':renderIdentity.classification==='software'?'Software WebGL':'WebGL renderer'),timer:t(renderIdentity.timerExtensionAvailable?'GPU timer available':'GPU timer unavailable')});}
 function renderFps(){if(currentFps!==null)$('#live-fps').textContent=t('{fps} FPS · current browser, not GPU time',{fps:currentFps});}
 function refreshLanguage(){
-  renderDynamicUI();renderModeCaption();renderFocusCaption();renderPlacementStatus();renderRenderStatus();renderFps();refreshToast();drawSection();
+  renderDynamicUI();syncMaterialControls();renderModeCaption();renderFocusCaption();renderPlacementStatus();renderRenderStatus();renderFps();refreshToast();drawSection();
   if(lastBenchmark)showBenchmark(lastBenchmark,{updateStatus:false});
   renderBenchmarkStatus();
   if(initializationError&&$('#loading'))$('#loading').textContent=t('Initialization failed: {error}',{error:translateError(initializationError)});
@@ -145,7 +147,23 @@ function setCameraView(value){
   controls.update();activeButton('[data-view]','view',value);render();
 }
 function setLighting(value){if(!lighting[value])throw new RangeError('Unknown lighting preset.');lightPreset=value;material.uniforms.uAmbient.value=lighting[value].ambient;material.uniforms.uLightIntensity.value=lighting[value].intensity;activeButton('[data-light]','light',value);render();}
-function setMaterialDetail(value){material.uniforms.uMaterialDetail.value=value?1:0;activeButton('[data-detail]','detail',Number(Boolean(value)));render();}
+function syncMaterialControls(){
+  for(const button of $('#material-detail').querySelectorAll('[data-material]'))button.textContent=t(getMaterialPreset(button.dataset.material).label);
+  activeButton('[data-material]','material',materialPreset);
+}
+function buildMaterialControls(){
+  $('#material-detail').replaceChildren(...MATERIAL_PRESETS.map(preset=>{
+    const button=document.createElement('button');button.type='button';button.dataset.material=preset.id;
+    button.dataset.detail=String(preset.uniforms.uMaterialDetail);return button;
+  }));
+  syncMaterialControls();
+}
+function setMaterialPreset(id){
+  const preset=getMaterialPreset(id);
+  for(const [name,value] of Object.entries(preset.uniforms))material.uniforms[name].value=value;
+  materialPreset=preset.id;syncMaterialControls();render();
+}
+function setMaterialDetail(value){setMaterialPreset(value?'aggregate':'baseline');}
 function setWetness(value){if(!Number.isFinite(value)||value<0||value>1)throw new RangeError('Wetness must be in [0,1].');material.uniforms.uWetness.value=value;$('#wetness').value=value;render();}
 function setLightAnimation(value){animateLight=Boolean(value);$('#animate-light').checked=animateLight;render();}
 function setLightAngle(value){lightAngle=Number(value);setLightAnimation(false);render();}
@@ -191,7 +209,7 @@ async function benchmark({frames=120,warmup=30,buildSamplesMs=[],metadata={},...
   if(busy)throw new Error('Wait for the current operation.');commitPending();
   const saved={paused,animateLight,before,mode,pixelRatio:renderer.getPixelRatio(),size:renderer.getSize(new THREE.Vector2()),aspect:camera.aspect,outline:$('#outline').checked};
   setBusy(true);benchmarkStatus={kind:'running',frames};renderBenchmarkStatus();paused=true;animateLight=false;before=false;$('#outline').checked=false;setMode(0);renderer.setPixelRatio(1);renderer.setSize(1280,720,false);camera.aspect=1280/720;camera.updateProjectionMatrix();
-  try{const result=await benchmarkRenderer({renderer,scene,camera,render,model,frames,warmup,buildSamplesMs,metadata:{surface:state.surface,potholes:state.potholes.length,resolution:state.resolution,mesh:state.mesh,shading:material.uniforms.uMaterialDetail.value?'improved':'baseline',parameters:getOptions(),presentation:{lightPreset,wetness:material.uniforms.uWetness.value,lightAngle},...metadata},...rest});lastBenchmark=result;showBenchmark(result);return result;}
+  try{const result=await benchmarkRenderer({renderer,scene,camera,render,model,frames,warmup,buildSamplesMs,metadata:{surface:state.surface,potholes:state.potholes.length,resolution:state.resolution,mesh:state.mesh,shading:material.uniforms.uMaterialDetail.value?'improved':'baseline',materialPreset,parameters:getOptions(),presentation:{lightPreset,materialPreset,wetness:material.uniforms.uWetness.value,lightAngle},...metadata},...rest});lastBenchmark=result;showBenchmark(result);return result;}
   catch(error){benchmarkStatus={kind:'error',message:error.message};renderBenchmarkStatus();throw error;}
   finally{renderer.setPixelRatio(saved.pixelRatio);renderer.setSize(saved.size.x,saved.size.y,false);camera.aspect=saved.aspect;camera.updateProjectionMatrix();paused=saved.paused;animateLight=saved.animateLight;before=saved.before;$('#outline').checked=saved.outline;setBusy(false);setMode(saved.mode);}
 }
@@ -200,7 +218,7 @@ function png(bytes,w,h){const canvas=document.createElement('canvas');canvas.wid
 function capturePixels(target,pass,w,h){material.uniforms.uMode.value=pass;material.wireframe=false;renderer.setRenderTarget(target);renderer.setClearColor(0,0);renderer.clear();render();const bytes=new Uint8Array(w*h*4);renderer.readRenderTargetPixels(target,0,0,w,h,bytes);return flipRows(bytes,w,h);}
 function cameraMetadata(w,h){
   camera.updateMatrixWorld();const p=camera.projectionMatrix.elements;
-  return {version:'1.0.0',width:w,height:h,units:'meters',pixelOrder:'row-major, top-left origin; pixel centers (x+0.5,y+0.5)',depth:{file:'depth_meters.f32',dtype:'float32',endianness:'little',invalid:'NaN for no road geometry',meaning:'positive optical-axis depth = -viewPosition.z; not range or normal displacement',near:camera.near,far:camera.far,quantizationMeters:(camera.far-camera.near)/16777215},intrinsics:{fx:w*p[0]/2,fy:h*p[5]/2,cx:w/2,cy:h/2},cameraConvention:'Three.js +X right, +Y up, viewing -Z; image y down',matrixOrder:'column-major',cameraToWorld:camera.matrixWorld.toArray(),worldToCamera:camera.matrixWorldInverse.toArray(),projection:camera.projectionMatrix.toArray(),mask:{meaning:'visible original top-surface footprint, interpolated boundaryField<=0; border=0',pothole:255,background:0},instances:{file:'instances.png',encoding:'8-bit RED channel only, ID 0=background/undamaged/border',mapping:state.potholes.map((hole,i)=>({value:i+1,id:hole.id}))},normal:{space:'camera/view',encoding:'RGB=round(255*(normalized geometric normal+1)/2)',validity:'alpha=255 on road geometry (including border), alpha=0 outside',materialNormalDetailIncluded:false},rasterization:{multisampling:false,antialiasing:false,overlays:false,sameMeshCameraPixelGrid:true},parameters:getOptions(),presentation:{view,lightPreset,lightAngle,materialDetail:material.uniforms.uMaterialDetail.value,wetness:material.uniforms.uWetness.value},implementation:'CPU normal displacement, local quadtree or graded tensor grid, WebGL/GLSL shading; analytic height fields only'};
+  return {version:'1.0.0',width:w,height:h,units:'meters',pixelOrder:'row-major, top-left origin; pixel centers (x+0.5,y+0.5)',depth:{file:'depth_meters.f32',dtype:'float32',endianness:'little',invalid:'NaN for no road geometry',meaning:'positive optical-axis depth = -viewPosition.z; not range or normal displacement',near:camera.near,far:camera.far,quantizationMeters:(camera.far-camera.near)/16777215},intrinsics:{fx:w*p[0]/2,fy:h*p[5]/2,cx:w/2,cy:h/2},cameraConvention:'Three.js +X right, +Y up, viewing -Z; image y down',matrixOrder:'column-major',cameraToWorld:camera.matrixWorld.toArray(),worldToCamera:camera.matrixWorldInverse.toArray(),projection:camera.projectionMatrix.toArray(),mask:{meaning:'visible original top-surface footprint, interpolated boundaryField<=0; border=0',pothole:255,background:0},instances:{file:'instances.png',encoding:'8-bit RED channel only, ID 0=background/undamaged/border',mapping:state.potholes.map((hole,i)=>({value:i+1,id:hole.id}))},normal:{space:'camera/view',encoding:'RGB=round(255*(normalized geometric normal+1)/2)',validity:'alpha=255 on road geometry (including border), alpha=0 outside',materialNormalDetailIncluded:false},rasterization:{multisampling:false,antialiasing:false,overlays:false,sameMeshCameraPixelGrid:true},parameters:getOptions(),presentation:{view,lightPreset,lightAngle,materialPreset,materialDetail:material.uniforms.uMaterialDetail.value,aggregateScale:material.uniforms.uAggregateScale.value,wetness:material.uniforms.uWetness.value},implementation:'CPU normal displacement, local quadtree or graded tensor grid, WebGL/GLSL shading; analytic height fields only'};
 }
 async function exportBundle({download:save=true,width=1280,height=720}={}){
   if(busy)throw new Error('Wait for the current operation.');commitPending();const w=Math.round(width),h=Math.round(height);
@@ -212,7 +230,7 @@ async function exportBundle({download:save=true,width=1280,height=720}={}){
     const depthBytes=new Uint8Array(w*h*4),dv=new DataView(depthBytes.buffer);
     for(let i=0;i<w*h;i++){const offset=i*4,k=packed[offset]*65536+packed[offset+1]*256+packed[offset+2];dv.setFloat32(offset,packed[offset+3]?camera.near+k/16777215*(camera.far-camera.near):NaN,true);mask[offset+3]=255;instances[offset+3]=255;}
     const metadata=cameraMetadata(w,h),images=await Promise.all([color,mask,normals,depthPreview,instances].map(bytes=>png(bytes,w,h)));
-    const readme='Pothole Lab final v1.0\nAll image passes use the SAME deformed top and border geometry, perspective camera and pixel grid. No MSAA or UI/outline overlays.\nRGB uses procedural aggregate and material-only normal detail. Normal/depth/mask/instance data are independent of lighting and material detail.\nMask=255 on visible damaged top surface, 0 elsewhere. instances.png: RED byte is ID 1..N within the mask; border and background=0.\nDepth is camera-axis depth -view.z in metres, NOT range or normal displacement. Read depth_meters.f32 as little-endian float32 (height,width), top-left; NaN outside geometry.\n24-bit packed depth is decoded to float32. Quantization bound is not total mesh/raster accuracy.\nNormals are normalized geometric camera-space normals, encoded RGB=(n+1)/2; alpha indicates visible road or border.\nArea metrics measure footprint on the ORIGINAL undamaged height field. Per-hole areas are independent; overlapping support disks are explicitly rejected.\nAnalytic height fields only; no arbitrary imported terrain or physical vehicle dynamics. See camera.json and metrics.json.\n';
+    const readme='Pothole Lab final v1.0\nAll image passes use the SAME deformed top and border geometry, perspective camera and pixel grid. No MSAA or UI/outline overlays.\nRGB uses the selected material preset recorded in camera.json. Material detail affects RGB shading only. Normal/depth/mask/instance data are independent of lighting and material detail.\nMask=255 on visible damaged top surface, 0 elsewhere. instances.png: RED byte is ID 1..N within the mask; border and background=0.\nDepth is camera-axis depth -view.z in metres, NOT range or normal displacement. Read depth_meters.f32 as little-endian float32 (height,width), top-left; NaN outside geometry.\n24-bit packed depth is decoded to float32. Quantization bound is not total mesh/raster accuracy.\nNormals are normalized geometric camera-space normals, encoded RGB=(n+1)/2; alpha indicates visible road or border.\nArea metrics measure footprint on the ORIGINAL undamaged height field. Per-hole areas are independent; overlapping support disks are explicitly rejected.\nAnalytic height fields only; no arbitrary imported terrain or physical vehicle dynamics. See camera.json and metrics.json.\n';
     const entries=[['rgb.png',images[0]],['mask.png',images[1]],['normals.png',images[2]],['depth_preview.png',images[3]],['instances.png',images[4]],['depth_meters.f32',depthBytes],['camera.json',JSON.stringify(metadata,null,2)],['metrics.json',JSON.stringify({...model.metrics,perHole:model.perHole},null,2)],['scene.json',JSON.stringify(getOptions(),null,2)],['README.txt',readme]];
     const blob=await zipStore(entries);if(save){download(`pothole-${state.surface}-${state.potholes.length}-instances.zip`,blob);toast('Exported aligned RGB, mask, instances, normals and metric depth.');}return {blob,metadata,depthBytes,color,mask,normals,instances,depthPreview};
   }finally{target.dispose();renderer.setRenderTarget(null);renderer.setClearColor(0x202b32,1);scene.background=saved.background;camera.aspect=saved.aspect;camera.updateProjectionMatrix();before=saved.before;paused=saved.paused;animateLight=saved.animateLight;$('#outline').checked=saved.outline;setBusy(false);setMode(saved.mode);}
@@ -221,7 +239,7 @@ function bindEvents(){
   $('#preset').addEventListener('change',e=>{try{loadPreset(e.target.value);}catch(error){toast(error.message);}});
   const bind=(selector,attribute,handler)=>$(selector).addEventListener('click',e=>{const b=e.target.closest(`[data-${attribute}]`);if(b)try{handler(b.dataset[attribute]);}catch(error){toast(error.message);}});
   bind('#surfaces','surface',surface=>tryChange({surface}));bind('#resolutions','resolution',resolution=>tryChange({resolution}));bind('#meshes','mesh',mesh=>tryChange({mesh}));
-  bind('#modes','mode',setMode);bind('#camera-views','view',setCameraView);bind('#lighting','light',setLighting);bind('#material-detail','detail',v=>setMaterialDetail(v==='1'));bind('#inspection-tabs','panel',showPanel);bind('#hole-list','hole',i=>selectHole(Number(i)));
+  bind('#modes','mode',setMode);bind('#camera-views','view',setCameraView);bind('#lighting','light',setLighting);bind('#material-detail','material',setMaterialPreset);bind('#inspection-tabs','panel',showPanel);bind('#hole-list','hole',i=>selectHole(Number(i)));
   bind('#section-axis','axis',axis=>{sectionAxis=axis;activeButton('[data-axis]','axis',axis);drawSection();});
   $('#allow-edge').addEventListener('change',e=>tryChange({edgeMode:e.target.checked?'clip':'reject'}));
   for(const name of ['area','depth','roughness','origin-u','origin-v'])$('#'+name).addEventListener('input',e=>queueInput(name,Number(e.target.value)));
@@ -243,11 +261,12 @@ function init(){
   renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;$('#viewport').prepend(renderer.domElement);
   scene=new THREE.Scene();scene.background=new THREE.Color(0x202b32);camera=new THREE.PerspectiveCamera(48,1,.1,50);
   material=new THREE.ShaderMaterial({vertexShader,fragmentShader,side:THREE.DoubleSide,uniforms:{uMode:{value:0},uDepth:{value:.36},uNear:{value:.1},uFar:{value:50},uLight:{value:new THREE.Vector3()},uAmbient:{value:.30},uLightIntensity:{value:1.35},uBefore:{value:0},uAggregateScale:{value:1},uWetness:{value:0},uMaterialDetail:{value:1}}});
+  for(const [name,value] of Object.entries(getMaterialPreset(materialPreset).uniforms))material.uniforms[name].value=value;
   controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=false;controls.addEventListener('change',()=>{if(!busy)render();});
-  bindEvents();rebuild();setCameraView('wide');new ResizeObserver(resize).observe($('#viewport'));resize();$('#loading').remove();
+  buildMaterialControls();bindEvents();rebuild();setCameraView('wide');new ResizeObserver(resize).observe($('#viewport'));resize();$('#loading').remove();
   renderIdentity=rendererIdentity(renderer);renderRenderStatus();renderModeCaption();
   let frames=0,last=performance.now();function frame(now){if(!paused&&!busy){render();frames++;}if(now-last>1400){currentFps=(frames*1000/(now-last)).toFixed(0);renderFps();frames=0;last=now;}requestAnimationFrame(frame);}requestAnimationFrame(frame);
-  window.potholeLab={get options(){return getOptions();},get model(){return model;},get metrics(){return model.metrics;},get renderer(){return renderer;},get camera(){return camera;},get scene(){return scene;},get selected(){return selected;},get comparison(){return comparison;},get performance(){return lastBenchmark;},get presentation(){return {view,lightPreset,before,animateLight,lightAngle,materialDetail:material.uniforms.uMaterialDetail.value,wetness:material.uniforms.uWetness.value};},rebuild,loadPreset,selectHole,updateSelected,addHole,removeHole,setMode,setBefore,setCameraView,setLighting,setMaterialDetail,setWetness,setLightAnimation,setLightAngle,showPanel,render,resize,pause,resume,benchmark,compareResolutions,exportBundle,crossSection:()=>crossSection(state,selected,sectionAxis)};
+  window.potholeLab={get options(){return getOptions();},get model(){return model;},get metrics(){return model.metrics;},get renderer(){return renderer;},get camera(){return camera;},get scene(){return scene;},get selected(){return selected;},get comparison(){return comparison;},get performance(){return lastBenchmark;},get presentation(){return {view,lightPreset,before,animateLight,lightAngle,materialPreset,materialDetail:material.uniforms.uMaterialDetail.value,aggregateScale:material.uniforms.uAggregateScale.value,wetness:material.uniforms.uWetness.value};},rebuild,loadPreset,selectHole,updateSelected,addHole,removeHole,setMode,setBefore,setCameraView,setLighting,setMaterialPreset,setMaterialDetail,setWetness,setLightAnimation,setLightAngle,showPanel,render,resize,pause,resume,benchmark,compareResolutions,exportBundle,crossSection:()=>crossSection(state,selected,sectionAxis)};
   window.dispatchEvent(new Event('pothole-ready'));
 }
 initI18n();

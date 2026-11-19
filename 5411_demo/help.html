@@ -43,6 +43,7 @@ li{margin:9px 0}a{color:var(--lime)}strong{color:var(--text)}
 <h2>Inspect and save</h2>
 <ul>
 <li><strong>Wireframe</strong> shows the triangle mesh. <strong>Normals</strong>, <strong>Mask</strong>, <strong>Depth</strong> and <strong>Instances</strong> show the corresponding inspection views.</li>
+<li>Under <strong>Material</strong>, <strong>Baseline</strong> is followed by <strong>Aggregate</strong>. Baseline uses the simpler surface shading; Aggregate adds stone detail to the appearance. Switching materials preserves the geometry and camera.</li>
 <li><strong>Original road</strong> toggles the undamaged surface. <strong>Cross-section</strong> shows a profile through the selected pothole; switch between across and along the road.</li>
 <li><strong>Sampling</strong> and <strong>Mesh construction</strong> change the geometry resolution and layout. <strong>Compare sampling levels</strong> measures the same scene at three resolutions.</li>
 <li><strong>Save scene</strong> downloads the current parameters as JSON. <strong>Load scene</strong> restores a previously saved scene.</li>
@@ -70,6 +71,7 @@ li{margin:9px 0}a{color:var(--lime)}strong{color:var(--text)}
 <h2>检查与保存</h2>
 <ul>
 <li><strong>线框</strong>显示三角网格；<strong>法线</strong>、<strong>掩膜</strong>、<strong>深度</strong>和<strong>实例</strong>分别提供相应的检查视图。</li>
+<li><strong>材质</strong>选项从左到右为<strong>基础材质</strong>和<strong>骨料细节</strong>。基础材质使用较简洁的表面着色，骨料细节增加石粒外观；切换时保留几何形状和相机视角。</li>
 <li><strong>原始路面</strong>可切换显示未损坏的路面。<strong>截面</strong>显示穿过选中坑洞的剖面曲线，可以在横向和纵向之间切换。</li>
 <li><strong>采样精度</strong>和<strong>网格构建方式</strong>用于调整几何分辨率和网格布局。<strong>比较采样精度</strong>会在三种分辨率下测量同一个场景。</li>
 <li><strong>保存场景</strong>会将当前参数下载为 JSON 文件；<strong>载入场景</strong>可恢复之前保存的场景。</li>
@@ -84,7 +86,7 @@ li{margin:9px 0}a{color:var(--lime)}strong{color:var(--text)}
 </article>
 </main>
 <script type="module">
-import { initI18n, getLanguage } from './src/i18n.mjs';
+import { initI18n, getLanguage } from './src/i18n.mjs?v=3';
 function syncHelpLanguage() {
   const language = getLanguage();
   for (const section of document.querySelectorAll('[data-help-lang]')) {

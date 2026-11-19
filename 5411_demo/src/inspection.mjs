@@ -1,5 +1,5 @@
 import {sampleCrossSection} from './geometry.mjs';
-import {t} from './i18n.mjs';
+import {t} from './i18n.mjs?v=3';
 
 export function crossSection(options,selected=0,axis='u'){
   const hole=options.potholes[selected],value=hole.origin[axis==='u'?'v':'u'];

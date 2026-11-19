@@ -66,6 +66,7 @@ const translations = {
   'Orbit light': '旋转光源',
   'Aggregate': '骨料细节',
   'Baseline': '基础材质',
+  'Unknown material preset.': '未知的材质预设。',
   'Wetness': '湿润程度',
   'Original road': '原始路面',
   'Footprints': '坑洞轮廓',

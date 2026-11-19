@@ -1,21 +1,21 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-11-17T13:49:25.938936+00:00",
+  "generatedAt": "2026-11-19T03:22:42.489732+00:00",
   "intendedUrl": "https://wonderhow.site/5411_demo/",
   "entryPoint": "index.html",
   "sourceProject": "pothole-final",
-  "payloadFiles": 18,
-  "totalPayloadBytes": 2204120,
+  "payloadFiles": 19,
+  "totalPayloadBytes": 2206733,
   "files": [
     {
       "path": "help.html",
-      "bytes": 8910,
-      "sha256": "8c705fd9dadf63c7aa5ec8ca7bada05de4290e7656582f282c2d4237caff20b5"
+      "bytes": 9411,
+      "sha256": "6eb486b5d5ba19909615e1602b44b06d3fd58d67989043f38d510cd8b3b29dfc"
     },
     {
       "path": "index.html",
-      "bytes": 9461,
-      "sha256": "a8aa0665ff7f755328a1db63f2583b5c2b6cc206f17646b65976999e8b4119be"
+      "bytes": 9540,
+      "sha256": "89a13955dbd8c4604bb76b7afec3091d313f58ed53ec1d53589381fa6341b703"
     },
     {
       "path": "lib/OrbitControls.js",
@@ -39,8 +39,8 @@
     },
     {
       "path": "src/app.mjs",
-      "bytes": 34371,
-      "sha256": "4fba02fb3c1038e6c9d7450173e3d546bb92376379cb5a10e95ed2c563fb7b4b"
+      "bytes": 35636,
+      "sha256": "d03980511673185b792d2928487147c915e468302e2057a899752a2d82315d19"
     },
     {
       "path": "src/comparison.mjs",
@@ -64,13 +64,18 @@
     },
     {
       "path": "src/i18n.mjs",
-      "bytes": 19178,
-      "sha256": "12a81e58bc62d2be128d2bfd1ee986e164759fbcd6204647362d166383e6969a"
+      "bytes": 19236,
+      "sha256": "bd8460cd9fd6bb667729670617060de5f99544e8b7aec107628d5e1c785e496d"
     },
     {
       "path": "src/inspection.mjs",
-      "bytes": 2136,
-      "sha256": "8cb708f85ce8f326cf294df3e4d7039f7bfafa26b1825a141b22c2311099f008"
+      "bytes": 2140,
+      "sha256": "f675b95f92fab4470b99e89a22cf1b6aad1b1679383bef1d58579e16f68760b2"
+    },
+    {
+      "path": "src/materials.mjs",
+      "bytes": 706,
+      "sha256": "ad3a3249b6b1a465ccd4c1348ef12dd5db95c1130fa9e1c6bd3066b63b728cb5"
     },
     {
       "path": "src/performance.mjs",
@@ -113,12 +118,12 @@
       },
       {
         "from": "index.html",
-        "ref": "help.html?v=2",
+        "ref": "help.html?v=3",
         "resolvedPath": "help.html"
       },
       {
         "from": "index.html",
-        "ref": "src/app.mjs?v=2",
+        "ref": "src/app.mjs?v=3",
         "resolvedPath": "src/app.mjs"
       },
       {
@@ -143,7 +148,7 @@
       },
       {
         "from": "help.html",
-        "ref": "./src/i18n.mjs",
+        "ref": "./src/i18n.mjs?v=3",
         "resolvedPath": "src/i18n.mjs"
       },
       {
@@ -178,7 +183,7 @@
       },
       {
         "from": "src/inspection.mjs",
-        "ref": "./i18n.mjs",
+        "ref": "./i18n.mjs?v=3",
         "resolvedPath": "src/i18n.mjs"
       },
       {
@@ -213,7 +218,7 @@
       },
       {
         "from": "src/app.mjs",
-        "ref": "./inspection.mjs?v=2",
+        "ref": "./inspection.mjs?v=3",
         "resolvedPath": "src/inspection.mjs"
       },
       {
@@ -223,13 +228,13 @@
       },
       {
         "from": "src/app.mjs",
-        "ref": "./i18n.mjs",
+        "ref": "./i18n.mjs?v=3",
         "resolvedPath": "src/i18n.mjs"
       },
       {
-        "from": "lib/three.module.js",
-        "ref": "./three.core.js",
-        "resolvedPath": "lib/three.core.js"
+        "from": "src/app.mjs",
+        "ref": "./materials.mjs",
+        "resolvedPath": "src/materials.mjs"
       },
       {
         "from": "lib/three.module.js",
@@ -237,13 +242,14 @@
         "resolvedPath": "lib/three.core.js"
       },
       {
-        "from": "index.html",
-        "ref": "./lib/three.module.js",
-        "resolvedPath": "lib/three.module.js"
+        "from": "lib/three.module.js",
+        "ref": "./three.core.js",
+        "resolvedPath": "lib/three.core.js"
       }
     ],
     "allRuntimeDependenciesLocal": true,
     "syntaxCheckedModules": [
+      "src/materials.mjs",
       "src/performance.mjs",
       "src/shaders.mjs",
       "src/geometry-final.mjs",
@@ -300,6 +306,21 @@
       "horizontalOverflow": false,
       "browserErrors": 0,
       "evidence": "QA retained outside public payload"
+    },
+    "materialSelectorSmoke": {
+      "status": "passed",
+      "order": [
+        "baseline",
+        "aggregate"
+      ],
+      "default": "aggregate",
+      "localizedLabels": true,
+      "preservesGeometryAndCamera": true,
+      "exportsSelectedPreset": true,
+      "materialOnlyChangesRGB": true,
+      "mobileWidth": 390,
+      "browserErrors": 0,
+      "evidence": "QA retained outside public payload"
     }
   },
   "githubPagesCompatibility": {
@@ -329,5 +350,14 @@
     "preferenceStorage": "localStorage",
     "externalTranslationService": false,
     "coverage": "Static controls, dynamic statuses/results/errors, cross-section and usage guide"
+  },
+  "materialPresets": {
+    "registry": "src/materials.mjs",
+    "order": [
+      "baseline",
+      "aggregate"
+    ],
+    "default": "aggregate",
+    "legacyDetailAPI": true
   }
 }
